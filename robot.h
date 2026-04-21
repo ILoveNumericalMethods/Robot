@@ -1,5 +1,4 @@
 #pragma once
-#include <Arduino.h>
 #include "sensors.h"
 #include "control.h"
 #include "motors.h"
@@ -10,10 +9,12 @@ struct Robot {
     Sensors sensors;
     Controller controller;
     Motors motors;
+    Logger logger;
 
     void begin();
     void update();
 
+    void read_input();
     void read_sensors();
     void update_mode();
     void compute_command();

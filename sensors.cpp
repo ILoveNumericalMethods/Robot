@@ -1,12 +1,11 @@
 #include "sensors.h"
-
 #include "config.h"
 
 
 SensorData::SensorData() {
     front_cm = INVALID_DISTANCE;
     front_right_cm = INVALID_DISTANCE;
-    rear_right_cm = INVALID_DISTANC;
+    rear_right_cm = INVALID_DISTANCE;
 }
 
 Sensors::Sensors() {
@@ -23,17 +22,14 @@ void Sensors::begin() {
 }
 
 void Sensors::update() {
-    data.front_cm = front_sensor.distance()
+    data.front_cm = front_sensor.distance();
     delay(TIME_BETWEEN_SENSORS);
-    data.front_cm = front_right_sensor.distance()
+    data.front_cm = front_right_sensor.distance();
     delay(TIME_BETWEEN_SENSORS);
-    data.front_cm = rear_right_sensor.distance()
+    data.front_cm = rear_right_sensor.distance();
     delay(TIME_BETWEEN_SENSORS);
 
 }
 
-const SensorData& Sensors::data() const {
-    return data;
-}
 
 

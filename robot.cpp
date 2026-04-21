@@ -1,12 +1,12 @@
-#include "Robot.h"
+#include "robot.h"
 
 void Robot::begin() {
     sensors.begin();
     controller.begin();
     motors.begin();
     logger.begin();
-    \\ai.begin
-    logger.printHeader();
+    //ai.begin();
+    logger.print_header();
 }
 
 void Robot::update() {
@@ -34,7 +34,7 @@ void Robot::compute_command() {
     controller.compute_command(sensors.data);
 }
 
-void Robot::drive_motors() {
+void Robot::drive_motors() 
     motors.drive(controller.command);
 }
 

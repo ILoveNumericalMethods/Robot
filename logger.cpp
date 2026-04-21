@@ -1,14 +1,15 @@
-#include "Logger.h"
+#include "logger.h"
+#include <Arduino.h>
 
 void Logger::begin() {
     start_time = millis();
 }
 
-void Logger::printHeader() {
+void Logger::print_header() {
     Seral.print("time, mode, sensF, sensFR, sensRR, motorL, motorR");
 }
 
-void Logger::log(const SensorData& sensors, const Controller& controller) {
+void Logger::log(const Sensors& sensors, const Controller& controller) {
     unsigned long time = millis() - start_time;
 
     Serial.print(time);
@@ -17,13 +18,13 @@ void Logger::log(const SensorData& sensors, const Controller& controller) {
     Serial.print(controller.mode);
     Serial.print(",");
 
-    Serial.print(sensors.front_cm);
+    Serial.print(sensors.data.front_cm);
     Serial.print(",");
 
-    Serial.print(sensors.front_right_cm);
+    Serial.print(sensors.data.front_right_cm);
     Serial.print(",");
 
-    Serial.print(sensors.rear_right_cm);
+    Serial.print(sensors.data.rear_right_cm);
     Serial.print(",");
 
     Serial.print(controller.command.left);

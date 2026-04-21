@@ -1,7 +1,7 @@
 #include "motors.h"
-
 #include "config.h"
 #include "pins.h"
+
 
 void apply_channel(int in1_pin, int in2_pin, int pwm_pin, int speed) {
     const int pwm_value = abs(speed);
