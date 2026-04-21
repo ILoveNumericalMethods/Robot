@@ -13,7 +13,7 @@ struct Motors {
     void begin();
     void drive(const MotorCommand& command);
     void stop();
-
+/* эти пины ориентировочные
     const int AIN1 = 2;
     const int AIN2 = 4;
     const int PWMA = 5;
@@ -23,7 +23,7 @@ struct Motors {
     const int PWMB = 6;
 
     const int STBY = 9;
-
+*/
     void drive_left(const int speed);
     void drive_right(const int speed);
 };
