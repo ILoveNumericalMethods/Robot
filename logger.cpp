@@ -5,7 +5,7 @@ void Logger::begin() {
 }
 
 void Logger::printHeader() {
-    Seral.print("time, mode, sensF, sensFR, sensR, sensBR, sensL, motorL, motorR");
+    Seral.print("time, mode, sensF, sensFR, sensRR, motorL, motorR");
 }
 
 void Logger::log(const SensorData& sensors, const Controller& controller) {
@@ -17,19 +17,13 @@ void Logger::log(const SensorData& sensors, const Controller& controller) {
     Serial.print(controller.mode);
     Serial.print(",");
 
-    Serial.print(sensors.front);
+    Serial.print(sensors.front_cm);
     Serial.print(",");
 
-    Serial.print(sensors.front_right);
+    Serial.print(sensors.front_right_cm);
     Serial.print(",");
 
-    Serial.print(sensors.right);
-    Serial.print(",");
-
-    Serial.print(sensors.back_right);
-    Serial.print(",");
-
-    Serial.print(sensors.left);
+    Serial.print(sensors.rear_right_cm);
     Serial.print(",");
 
     Serial.print(controller.command.left);

@@ -1,25 +1,30 @@
 #pragma once
+
 #include <Arduino.h>
+#include <iarduino_HC_SR04.h>
+
+#include "pins.h"
 
 struct SensorData {
-    float front;
-    float left;
-    float right;
-    float front_right;
-    float back_right;
+    float front_cm;
+    float front_right_cm;
+    float rear_right_cm;
 
     SensorData();
 };
 
-struct Sensors {
-    SensorData data;
+class Sensors {
+public:
+    Sensors();
 
     void begin();
     void update();
+    const SensorData& data() const;
 
-    float read_front();
-    float read_front_right();
-    float read_right();
-    float read_left();
-    float read_back_right();
+private:
+    SensorData data;
+
+    iarduino_HC_SR04 front_sensor;
+    iarduino_HC_SR04 front_right_sensor;
+    iarduino_HC_SR04 rear_right_sensor;
 };

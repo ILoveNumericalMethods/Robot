@@ -4,6 +4,7 @@
 #include "control.h"
 #include "motors.h"
 #include "logger.h"
+#include "ai.h"
 
 struct Robot {
     Sensors sensors;
@@ -13,11 +14,11 @@ struct Robot {
     void begin();
     void update();
 
-    void readSensors();
-    void updateMode();
-    void computeCommand();
-    void driveMotors();
-    void logData();
+    void read_sensors();
+    void update_mode();
+    void compute_command();
+    void drive_motors();
+    void log_state();
 };
 
 

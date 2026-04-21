@@ -1,4 +1,5 @@
 #include "Control.h"
+#include "ai.h"
 
 ManualKeys::ManualKeys() {
     clear();
@@ -78,6 +79,7 @@ void Controller::updateMode(const SensorData& sensors) {
         return;
     }
 
+
     if (danger_position(sensors)) {
         if (warning) {
             mode = "STOP";
@@ -90,27 +92,22 @@ void Controller::updateMode(const SensorData& sensors) {
     else {
         warning = true;
     }
-     
-    if (mode == "TURN"){
-        if (wall_on_right(sensors)) {
-            mode = "FOLLOW"
-            return;
-        }
-        else 
-            return;
+    
+
+    if (mode == "FOLLOW") {
+        return
     }
 
-    if (wall_on_left(sensors)) {
-        mode = "TURN";
+
+    if (wall_is_found(sensors)) {
+        mode = "FOLLOW"
         return;
     }
-
-    if (wall_on_right(sensors)) {
-        mode = "FOLLOW";
+    else {
+        mode = "FORWARD";
         return;
     }
-
-    mode = "FORWARD";
+ 
 }
 
 void Controller::compute_manual_command() {
@@ -174,13 +171,8 @@ void Controller::computeCommand(const SensorData& sensors) {
         return;
     }
 
-    if (mode == "TURN") {
-        command = MotorCommand(100, 0);
-        return;
-    }
-
     if (mode == "FOLLOW") {
-        /*put your neural network here*/
+        command = ai_compute_command(sensors)
         return;
     }
 
@@ -197,14 +189,11 @@ void Controller::computeCommand(const SensorData& sensors) {
 
 
 bool Controller::danger_position(const SensorData& sensors) {
-    return (sensors.front <= RISE_ERROR_FRONT_DISTENCE or sensors.back_right <= RISE_ERROR_SIDE_DISTENCE or sensors.left 
-        <= RISE_ERROR_SIDE_DISTENCE or sensors.right <= RISE_ERROR_SIDE_DISTENCE or sensors.front_right <= RISE_ERROR_SIDE_DISTENCE);
+    return (sensors.front_cm <= RISE_ERROR_DISTENCE or sensors.rear_right_cm <= RISE_ERROR_SIDE_DISTENCE
+         or sensors.front_right_cm <= RISE_ERROR_SIDE_DISTENCE);
 }
 
-bool Controller::wall_on_right(const SensorData& sensors) {
-    return  (std::max(sensors.front_right, sensors.right, sensors.back_right) < MAX_DISTANCE_TO_WALL);
+bool Controller::wall_is_found(const SensorData& sensors) {
+    return  (std::min(sensors.front_cm, sensors.front_right_cm, sensors.rear_right_cm) < MAX_DISTANCE_TO_WALL);
 }
 
-bool Controller::wall_on_left(const SensorData& sensors) {
-    return (sensors.left < sensors.right and sensors.left < MAX_DISTANCE_TO_LEFT_WALL);
-}
