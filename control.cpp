@@ -74,7 +74,7 @@ void Controller::read_key_state(const String& line) {
 }
 
 
-void Controller::updateMode(const SensorData& sensors) {
+void Controller::update_mode(const SensorData& sensors) {
     if mode == "MANUAL" {
         return;
     }
@@ -161,7 +161,7 @@ void Controller::compute_manual_command() {
     action = "stop";
 }
 
-void Controller::computeCommand(const SensorData& sensors) {
+void Controller::compute_command(const SensorData& sensors) {
     if (mode = "MANUAL") {
         comand = compute_manual_command()   
     }

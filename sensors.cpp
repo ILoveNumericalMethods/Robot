@@ -2,12 +2,6 @@
 
 #include "config.h"
 
-namespace {
-constexpr uint16_t sensor_library_averaging = 15;
-constexpr int8_t sensor_air_temperature_c = 23;
-constexpr uint8_t sensor_count = 3;
-constexpr unsigned long sensor_measurement_spacing_ms = 50;
-}  // namespace
 
 SensorData::SensorData() {
     front_cm = INVALID_DISTANCE;

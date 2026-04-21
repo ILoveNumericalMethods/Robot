@@ -31,7 +31,5 @@ struct Controller {
     void Controller::handle_Serial();
 
     bool danger_position(const SensorData& sensors);
-    bool alignedWithWall(const SensorData& sensors);
-    bool wall_on_right(const SensorData& sensors)
-    bool wall_on_left(const SensorData& sensors)
+    bool wall_is_found(const SensorData& sensors);
 };

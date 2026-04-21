@@ -5,44 +5,40 @@ void Robot::begin() {
     controller.begin();
     motors.begin();
     logger.begin();
+    \\ai.begin
     logger.printHeader();
 }
 
 void Robot::update() {
-    readUserInput();
-    readSensors();
-    updateMode();
-    computeCommand();
-    applySafety();
-    driveMotors();
-    logData();
+    read_input();
+    read_sensors();
+    update_mode();
+    compute_command();
+    drive_motors();
+    log_state();
 }
 
-void Robot::readUserInput() {
+void Robot::read_input() {
     controller.handleSerial();
 }
 
-void Robot::readSensors() {
+void Robot::read_sensors() {
     sensors.update();
 }
 
-void Robot::updateMode() {
-    controller.updateMode(sensors.data);
+void Robot::update_mode() {
+    controller.update_mode(sensors.data);
 }
 
-void Robot::computeCommand() {
-    controller.computeCommand(sensors.data);
+void Robot::compute_command() {
+    controller.compute_command(sensors.data);
 }
 
-void Robot::applySafety() {
-    controller.applySafety(sensors.data);
-}
-
-void Robot::driveMotors() {
+void Robot::drive_motors() {
     motors.drive(controller.command);
 }
 
-void Robot::logData() {
+void Robot::log_state() {
     logger.log(sensors, controller);
 }    
 

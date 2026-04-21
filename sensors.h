@@ -19,7 +19,7 @@ public:
 
     void begin();
     void update();
-    const SensorData& data() const;
+    const SensorData& get_data() const;
 
 private:
     SensorData data;
