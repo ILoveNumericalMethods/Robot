@@ -19,4 +19,4 @@ const int PIN_ECHO_REAR_RIGHT       = 11;
 const int PIN_TRIG_FRONT_RIGHT = 12;
 const int PIN_ECHO_FRONT_RIGHT       = 11;
 const int PIN_TRIG_FRONT  = 12;
-const int PIN_ECHO_FRONT        = 12
+const int PIN_ECHO_FRONT        = 12;

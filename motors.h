@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Arduino.h>
 
 struct MotorCommand {
     int left;
@@ -21,3 +22,6 @@ private:
 };
 
 void apply_channel(int in1_pin, int in2_pin, int pwm_pin, int speed);
+
+
+

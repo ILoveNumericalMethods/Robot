@@ -1,4 +1,5 @@
 #include "control.h"
+
 #include "ai.h"
 #include "config.h"
 
@@ -31,7 +32,7 @@ void Controller::handle_serial() {
         return;
     }
 
-    std::string line = Serial.readStringUntil('\n');
+    String line = Serial.readStringUntil('\n');
     line.trim();
 
     if (line == "m") {
@@ -48,11 +49,11 @@ void Controller::handle_serial() {
         return;
     }
 
-    if (driveMode != "MANUAL") {
+    if (mode != "MANUAL") {
         return;
     }
 
-    if (line == "x" || line.length() == 0) {
+    if (line.length() == 0 || line == "x") {
         keys.clear();
         return;
     }
@@ -63,8 +64,8 @@ void Controller::handle_serial() {
 void Controller::read_key_state(const String& line) {
     keys.clear();
 
-    for (int i = 0; i < line.length(); i++) {
-        char c = line.charAt(i);
+    for (int i = 0; i < line.length(); ++i) {
+        const char c = line.charAt(i);
 
         if (c == 'w') keys.w = true;
         if (c == 'a') keys.a = true;
@@ -73,45 +74,34 @@ void Controller::read_key_state(const String& line) {
     }
 }
 
-
 void Controller::update_mode(const Sensors& sensors) {
     if (mode == "MANUAL") {
         return;
     }
-
 
     if (danger_position(sensors)) {
         if (warning) {
             mode = "STOP";
             return;
         }
-        else {
-            warning = true;
-        } 
-    }
-    else {
         warning = true;
+    } else {
+        warning = false;
     }
-    
 
     if (mode == "FOLLOW") {
         return;
     }
 
-
     if (wall_is_found(sensors)) {
-        mode = "FOLLOW"
+        mode = "FOLLOW";
         return;
     }
-    else {
-        mode = "FORWARD";
-        return;
-    }
- 
+
+    mode = "FORWARD";
 }
 
 void Controller::compute_manual_command() {
-    // конфликтующие пары
     if ((keys.w && keys.s) || (keys.a && keys.d)) {
         command = MotorCommand(0, 0);
         return;
@@ -161,8 +151,9 @@ void Controller::compute_manual_command() {
 }
 
 void Controller::compute_command(const Sensors& sensors) {
-    if (mode = "MANUAL") {
-        comand = compute_manual_command();
+    if (mode == "MANUAL") {
+        compute_manual_command();
+        return;
     }
 
     if (mode == "WAITING") {
@@ -171,7 +162,8 @@ void Controller::compute_command(const Sensors& sensors) {
     }
 
     if (mode == "FOLLOW") {
-        //command = ai_compute_command(sensors);
+        AiController ai;
+        command = ai.predict(sensors.data, sensors.data);
         return;
     }
 
@@ -179,23 +171,23 @@ void Controller::compute_command(const Sensors& sensors) {
         command = MotorCommand(0, 0);
         return;
     }
-    
+
     if (mode == "FORWARD") {
         command = MotorCommand(90, 90);
         return;
     }
+
+    command = MotorCommand(0, 0);
 }
 
-
 bool Controller::danger_position(const Sensors& sensors) {
-    return (sensors.data.front_cm <= RISE_ERROR_DISTENCE or sensors.data.rear_right_cm <= RISE_ERROR_DISTENCE
-         or sensors.data.front_right_cm <= RISE_ERROR_DISTENCE);
+    return sensors.data.front_cm <= RISE_ERROR_DISTENCE ||
+           sensors.data.rear_right_cm <= RISE_ERROR_DISTENCE ||
+           sensors.data.front_right_cm <= RISE_ERROR_DISTENCE;
 }
 
 bool Controller::wall_is_found(const Sensors& sensors) {
-    return  (sensors.data.front_cm < MAX_DISTANCE_TO_WALL || sensors.data.front_right_cm < MAX_DISTANCE_TO_WALL 
-        || sensors.data.rear_right_cm < MAX_DISTANCE_TO_WALL);
+    return sensors.data.front_cm < MAX_DISTANCE_TO_WALL ||
+           sensors.data.front_right_cm < MAX_DISTANCE_TO_WALL ||
+           sensors.data.rear_right_cm < MAX_DISTANCE_TO_WALL;
 }
-
-
-

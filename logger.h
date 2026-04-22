@@ -1,6 +1,9 @@
 #pragma once
+
+#include <Arduino.h>
+
+#include "control.h"
 #include "sensors.h"
-#include "motors.h"
 
 struct Logger {
     unsigned long start_time;

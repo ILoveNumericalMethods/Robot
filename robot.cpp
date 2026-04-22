@@ -5,7 +5,6 @@ void Robot::begin() {
     controller.begin();
     motors.begin();
     logger.begin();
-    //ai.begin();
     logger.print_header();
 }
 
@@ -19,7 +18,7 @@ void Robot::update() {
 }
 
 void Robot::read_input() {
-    controller.handleSerial();
+    controller.handle_serial();
 }
 
 void Robot::read_sensors() {
@@ -27,18 +26,17 @@ void Robot::read_sensors() {
 }
 
 void Robot::update_mode() {
-    controller.update_mode(sensors.data);
+    controller.update_mode(sensors);
 }
 
 void Robot::compute_command() {
-    controller.compute_command(sensors.data);
+    controller.compute_command(sensors);
 }
 
-void Robot::drive_motors() 
+void Robot::drive_motors() {
     motors.drive(controller.command);
 }
 
 void Robot::log_state() {
     logger.log(sensors, controller);
-}    
-
+}

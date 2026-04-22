@@ -1,9 +1,10 @@
 #pragma once
-#include "sensors.h"
-#include "control.h"
-#include "motors.h"
-#include "logger.h"
+
 #include "ai.h"
+#include "control.h"
+#include "logger.h"
+#include "motors.h"
+#include "sensors.h"
 
 struct Robot {
     Sensors sensors;
@@ -13,7 +14,6 @@ struct Robot {
 
     void begin();
     void update();
-
     void read_input();
     void read_sensors();
     void update_mode();
@@ -21,5 +21,3 @@ struct Robot {
     void drive_motors();
     void log_state();
 };
-
-
