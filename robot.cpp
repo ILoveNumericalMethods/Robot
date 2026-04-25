@@ -1,6 +1,9 @@
 #include "robot.h"
 
 void Robot::begin() {
+    Serial.begin(9600);
+    delay(1500);
+    
     sensors.begin();
     controller.begin();
     motors.begin();
