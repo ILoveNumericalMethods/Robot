@@ -3,7 +3,7 @@
 // time in ms
 const int TIME_BETWEEN_SENSORS = 50;
 
-const int AVERAGING = 1;
+const int AVERAGING = 100;
 
 const int INVALID_DISTANCE = 400;
 const int MAX_DISTANCE_TO_WALL = 150;

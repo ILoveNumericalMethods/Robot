@@ -14,6 +14,10 @@ void ManualKeys::clear() {
     d = false;
 }
 
+bool ManualKeys::empty() const {
+    return !w && !a && !s && !d;
+}
+
 Controller::Controller() {
     mode = "WAITING";
     warning = false;
@@ -32,9 +36,29 @@ void Controller::handle_serial() {
         return;
     }
 
-    String line = Serial.readStringUntil('\n');
-    line.trim();
+    String last_move_line = "";
 
+    while (Serial.available()) {
+        String line = Serial.readStringUntil('\n');
+        line.trim();
+
+        if (line.length() == 0) {
+            continue;
+        }
+
+        if (line == "m" || line == "u") {
+            handle_serial_line(line);
+        } else {
+            last_move_line = line;
+        }
+    }
+
+    if (last_move_line.length() > 0) {
+        handle_serial_line(last_move_line);
+    }
+}
+
+void Controller::handle_serial_line(const String& line) {
     if (line == "m") {
         mode = "MANUAL";
         keys.clear();
@@ -53,8 +77,9 @@ void Controller::handle_serial() {
         return;
     }
 
-    if (line.length() == 0 || line == "x") {
+    if (line == "x") {
         keys.clear();
+        command = MotorCommand(0, 0);
         return;
     }
 
@@ -65,12 +90,17 @@ void Controller::read_key_state(const String& line) {
     keys.clear();
 
     for (int i = 0; i < line.length(); ++i) {
-        const char c = line.charAt(i);
+        char c = line.charAt(i);
 
-        if (c == 'w') keys.w = true;
-        if (c == 'a') keys.a = true;
-        if (c == 's') keys.s = true;
-        if (c == 'd') keys.d = true;
+        if (c == 'w') {
+            keys.w = true;
+        } else if (c == 'a') {
+            keys.a = true;
+        } else if (c == 's') {
+            keys.s = true;
+        } else if (c == 'd') {
+            keys.d = true;
+        }
     }
 }
 
@@ -78,6 +108,7 @@ void Controller::update_mode(const Sensors& sensors) {
     if (mode == "MANUAL") {
         return;
     }
+
     /*
     if (danger_position(sensors)) {
         if (warning) {
@@ -87,7 +118,8 @@ void Controller::update_mode(const Sensors& sensors) {
         warning = true;
     } else {
         warning = false;
-    }*/
+    }
+    */
 
     if (mode == "FOLLOW") {
         return;
@@ -102,6 +134,11 @@ void Controller::update_mode(const Sensors& sensors) {
 }
 
 void Controller::compute_manual_command() {
+    if (keys.empty()) {
+        command = MotorCommand(0, 0);
+        return;
+    }
+
     if ((keys.w && keys.s) || (keys.a && keys.d)) {
         command = MotorCommand(0, 0);
         return;

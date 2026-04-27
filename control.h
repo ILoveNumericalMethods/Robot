@@ -12,7 +12,9 @@ struct ManualKeys {
     bool d;
 
     ManualKeys();
+
     void clear();
+    bool empty() const;
 };
 
 struct Controller {
@@ -24,11 +26,15 @@ struct Controller {
     Controller();
 
     void begin();
+
     void update_mode(const Sensors& sensors);
     void compute_command(const Sensors& sensors);
     void compute_manual_command();
-    void read_key_state(const String& line);
+
     void handle_serial();
+    void handle_serial_line(const String& line);
+    void read_key_state(const String& line);
+
     bool danger_position(const Sensors& sensors);
     bool wall_is_found(const Sensors& sensors);
 };
