@@ -109,7 +109,6 @@ void Controller::update_mode(const Sensors& sensors) {
         return;
     }
 
-    /*
     if (danger_position(sensors)) {
         if (warning) {
             mode = "STOP";
@@ -119,7 +118,6 @@ void Controller::update_mode(const Sensors& sensors) {
     } else {
         warning = false;
     }
-    */
 
     if (mode == "FOLLOW") {
         return;
