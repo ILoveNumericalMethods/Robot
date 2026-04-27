@@ -78,7 +78,7 @@ void Controller::update_mode(const Sensors& sensors) {
     if (mode == "MANUAL") {
         return;
     }
-
+    /*
     if (danger_position(sensors)) {
         if (warning) {
             mode = "STOP";
@@ -87,7 +87,7 @@ void Controller::update_mode(const Sensors& sensors) {
         warning = true;
     } else {
         warning = false;
-    }
+    }*/
 
     if (mode == "FOLLOW") {
         return;

@@ -1,9 +1,10 @@
 #include "robot.h"
 
 void Robot::begin() {
-    Serial.begin(9600);
+    Serial.begin(115200);
+    Serial.setTimeout(5);
     delay(1500);
-    
+
     sensors.begin();
     controller.begin();
     motors.begin();

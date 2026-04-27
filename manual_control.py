@@ -1,45 +1,51 @@
-import sys
+import serial
 import time
 import pygame
-import serial
+
+PORT = "COM12"
+BAUD = 115200
+
+SEND_INTERVAL = 0.02  # 20 ms = 50 commands/sec
 
 
-PORT = "COM5"       # <-- замени на свой порт
-BAUDRATE = 9600
-SEND_INTERVAL = 0.05   # секунды между отправками
+def build_command(keys):
+    command = ""
+
+    if keys[pygame.K_w]:
+        command += "w"
+    if keys[pygame.K_a]:
+        command += "a"
+    if keys[pygame.K_s]:
+        command += "s"
+    if keys[pygame.K_d]:
+        command += "d"
+
+    if command == "":
+        command = "x"
+
+    return command
 
 
-def build_command(keys_pressed: set[str]) -> str:
-    order = ["w", "a", "s", "d"]
-    command = "".join(k for k in order if k in keys_pressed)
-    return command if command else "x"
-
-
-def main() -> None:
-    try:
-        ser = serial.Serial(PORT, BAUDRATE, timeout=0.1)
-    except serial.SerialException as e:
-        print(f"Не удалось открыть порт {PORT}: {e}")
-        sys.exit(1)
+def main():
+    ser = serial.Serial(PORT, BAUD, timeout=0.001)
+    time.sleep(2)
 
     pygame.init()
-    screen = pygame.display.set_mode((500, 220))
-    pygame.display.set_caption("Arduino manual control")
+    screen = pygame.display.set_mode((400, 200))
+    pygame.display.set_caption("Robot manual control")
 
-    font = pygame.font.SysFont(None, 28)
-    clock = pygame.time.Clock()
+    print("M - manual mode")
+    print("U - auto mode")
+    print("W/A/S/D - move")
+    print("SPACE - stop")
+    print("ESC - quit")
+    print("Logs from Arduino will appear below:")
+    print("-------------------------------------")
 
-    pressed: set[str] = set()
-    last_sent = None
-    last_send_time = 0.0
     running = True
     manual_enabled = False
-
-    print("Управление:")
-    print("  M  -> manual mode")
-    print("  U  -> auto mode")
-    print("  W A S D -> движение")
-    print("  ESC -> выход")
+    last_send_time = 0
+    last_command = None
 
     while running:
         now = time.time()
@@ -55,64 +61,39 @@ def main() -> None:
                 elif event.key == pygame.K_m:
                     ser.write(b"m\n")
                     manual_enabled = True
-                    print("Отправлено: m")
+                    print("sent: m")
 
                 elif event.key == pygame.K_u:
                     ser.write(b"u\n")
                     manual_enabled = False
-                    print("Отправлено: u")
+                    print("sent: u")
 
-                elif event.key == pygame.K_w:
-                    pressed.add("w")
-                elif event.key == pygame.K_a:
-                    pressed.add("a")
-                elif event.key == pygame.K_s:
-                    pressed.add("s")
-                elif event.key == pygame.K_d:
-                    pressed.add("d")
+                elif event.key == pygame.K_SPACE:
+                    ser.write(b"x\n")
+                    last_command = "x"
+                    print("sent: x")
 
-            elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_w:
-                    pressed.discard("w")
-                elif event.key == pygame.K_a:
-                    pressed.discard("a")
-                elif event.key == pygame.K_s:
-                    pressed.discard("s")
-                elif event.key == pygame.K_d:
-                    pressed.discard("d")
+        keys = pygame.key.get_pressed()
 
         if manual_enabled and now - last_send_time >= SEND_INTERVAL:
-            command = build_command(pressed)
-            if command != last_sent:
-                ser.write((command + "\n").encode("utf-8"))
-                print(f"Отправлено: {command}")
-                last_sent = command
+            command = build_command(keys)
+            ser.write((command + "\n").encode("utf-8"))
+
+            if command != last_command:
+                print("sent:", command)
+                last_command = command
+
             last_send_time = now
 
-        screen.fill((245, 245, 245))
-
-        lines = [
-            f"PORT: {PORT}",
-            f"Mode: {'MANUAL' if manual_enabled else 'AUTO'}",
-            f"Pressed: {''.join(sorted(pressed)) if pressed else '(none)'}",
-            f"Command: {build_command(pressed) if manual_enabled else '(auto mode)'}",
-            "Keys: M=manual, U=auto, WASD=drive, ESC=exit",
-        ]
-
-        y = 20
-        for line in lines:
-            img = font.render(line, True, (20, 20, 20))
-            screen.blit(img, (20, y))
-            y += 35
+        while ser.in_waiting > 0:
+            line = ser.readline().decode("utf-8", errors="replace").strip()
+            if line:
+                print(line)
 
         pygame.display.flip()
-        clock.tick(60)
+        time.sleep(0.002)
 
-    try:
-        ser.write(b"x\n")
-    except Exception:
-        pass
-
+    ser.write(b"x\n")
     ser.close()
     pygame.quit()
 

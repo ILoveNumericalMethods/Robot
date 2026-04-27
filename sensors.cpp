@@ -21,11 +21,14 @@ void Sensors::begin() {
 
 void Sensors::update() {
     data.front_cm = front_sensor.distance();
+    data.front_cm = 0;
     delay(TIME_BETWEEN_SENSORS);
 
     data.front_right_cm = front_right_sensor.distance();
+    data.front_right_cm = 0;
     delay(TIME_BETWEEN_SENSORS);
 
     data.rear_right_cm = rear_right_sensor.distance();
+    data.rear_right_cm = 0;
     delay(TIME_BETWEEN_SENSORS);
 }
