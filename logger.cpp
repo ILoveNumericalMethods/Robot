@@ -26,6 +26,10 @@ void Logger::log(const Sensors& sensors, const Controller& controller) {
     Serial.println(controller.current_command.right);
 }
 
+void Logger::print_header_dataset() {
+    Serial.println("front,front_delta,front_right,front_right_delta,rear_right,rear_right_delta,mode1,mode2,mode3,mode4,prev_mode5,prev_mode1,prev_mode2,prev_mode3,prev_mode4,prev_mode5");
+}
+
 void Logger::log_dataset(const Sensors& sensors, const Controller& controller) {
     
     Serial.print(sensors.data.front_cm);
@@ -42,7 +46,7 @@ void Logger::log_dataset(const Sensors& sensors, const Controller& controller) {
     Serial.print(',');
 
 
-    if (controller.current_command.left == -70 && controller.current_command.left == 70) {   
+    if (controller.current_command.left == -70 && controller.current_command.right == 70) {   
         Serial.print(1);
         Serial.print(',');
         Serial.print(0);
@@ -54,7 +58,7 @@ void Logger::log_dataset(const Sensors& sensors, const Controller& controller) {
         Serial.print(0);
         Serial.print(',');
 
-    } else if (controller.current_command.left == 80 && controller.current_command.left == 140) {
+    } else if (controller.current_command.left == 80 && controller.current_command.right == 140) {
         Serial.print(0);
         Serial.print(',');
         Serial.print(1);
@@ -66,7 +70,7 @@ void Logger::log_dataset(const Sensors& sensors, const Controller& controller) {
         Serial.print(0);
         Serial.print(',');
 
-    } else if (controller.current_command.left == 120 && controller.current_command.left == 120) {
+    } else if (controller.current_command.left == 120 && controller.current_command.right == 120) {
         Serial.print(0);
         Serial.print(',');
         Serial.print(0);
@@ -77,7 +81,7 @@ void Logger::log_dataset(const Sensors& sensors, const Controller& controller) {
         Serial.print(',');
         Serial.print(0);
         Serial.print(',');
-    } else if (controller.current_command.left == 140 && controller.current_command.left == 80) {
+    } else if (controller.current_command.left == 140 && controller.current_command.right == 80) {
         Serial.print(0);
         Serial.print(',');
         Serial.print(0);
@@ -88,7 +92,7 @@ void Logger::log_dataset(const Sensors& sensors, const Controller& controller) {
         Serial.print(',');
         Serial.print(0);
         Serial.print(',');
-    } else if (controller.current_command.left == 70 && controller.current_command.left == -70) {
+    } else if (controller.current_command.left == 70 && controller.current_command.right == -70) {
         Serial.print(0);
         Serial.print(',');
         Serial.print(0);
@@ -112,7 +116,7 @@ void Logger::log_dataset(const Sensors& sensors, const Controller& controller) {
         Serial.print(',');
     }
 
-    if (controller.previous_command.left == -70 && controller.previous_command.left == 70) {   
+    if (controller.previous_command.left == -70 && controller.previous_command.right == 70) {   
         Serial.print(1);
         Serial.print(',');
         Serial.print(0);
@@ -124,7 +128,7 @@ void Logger::log_dataset(const Sensors& sensors, const Controller& controller) {
         Serial.print(0);
         Serial.print(',');
 
-    } else if (controller.previous_command.left == 80 && controller.previous_command.left == 140) {
+    } else if (controller.previous_command.left == 80 && controller.previous_command.right == 140) {
         Serial.print(0);
         Serial.print(',');
         Serial.print(1);
@@ -136,7 +140,7 @@ void Logger::log_dataset(const Sensors& sensors, const Controller& controller) {
         Serial.print(0);
         Serial.print(',');
 
-    } else if (controller.previous_command.left == 120 && controller.previous_command.left == 120) {
+    } else if (controller.previous_command.left == 120 && controller.previous_command.right == 120) {
         Serial.print(0);
         Serial.print(',');
         Serial.print(0);
@@ -147,7 +151,7 @@ void Logger::log_dataset(const Sensors& sensors, const Controller& controller) {
         Serial.print(',');
         Serial.print(0);
         Serial.print(',');
-    } else if (controller.previous_command.left == 140 && controller.previous_command.left == 80) {
+    } else if (controller.previous_command.left == 140 && controller.previous_command.right == 80) {
         Serial.print(0);
         Serial.print(',');
         Serial.print(0);
@@ -158,7 +162,7 @@ void Logger::log_dataset(const Sensors& sensors, const Controller& controller) {
         Serial.print(',');
         Serial.print(0);
         Serial.print(',');
-    } else if (controller.previous_command.left == 70 && controller.previous_command.left == -70) {
+    } else if (controller.previous_command.left == 70 && controller.previous_command.right == -70) {
         Serial.print(0);
         Serial.print(',');
         Serial.print(0);

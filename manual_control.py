@@ -1,3 +1,4 @@
+import os
 import time
 
 import pygame
@@ -7,7 +8,10 @@ import serial
 PORT = "COM12"
 BAUD = 115200
 
-SEND_INTERVAL = 0.03
+LOG_FILE = "robot_log.csv"
+
+FPS = 100
+AUTO_SEND_MANUAL_MODE = True
 
 
 def build_command(keys):
@@ -22,113 +26,123 @@ def build_command(keys):
     if keys[pygame.K_d]:
         command += "d"
 
+    if command == "":
+        command = "x"
+
     return command
 
 
-def send_line(ser, line):
-    ser.write((line + "\n").encode("utf-8"))
+def send_command(ser, command):
+    # Удаляем то, что еще не успело уйти из буфера компьютера.
+    # Это не очищает буфер Arduino, но уменьшает накопление команд со стороны Python.
+    try:
+        ser.reset_output_buffer()
+    except serial.SerialException:
+        pass
+
+    ser.write((command + "\n").encode("utf-8"))
 
 
-def read_arduino_logs(ser):
-    while ser.in_waiting > 0:
-        line = ser.readline().decode("utf-8", errors="replace").strip()
-        if line:
-            print(line)
+def read_logs_to_file(ser, file):
+    n = ser.in_waiting
+
+    if n > 0:
+        data = ser.read(n)
+        file.write(data)
+        return n
+
+    return 0
 
 
 def main():
-    ser = serial.Serial(PORT, BAUD, timeout=0.001)
+    print("Log file:", os.path.abspath(LOG_FILE))
 
-    # Arduino Nano usually resets after opening the serial port.
-    time.sleep(2.0)
+    with open(LOG_FILE, "wb") as log_file:
+        ser = serial.Serial(PORT, BAUD, timeout=0)
 
-    pygame.init()
-    screen = pygame.display.set_mode((500, 250))
-    pygame.display.set_caption("Robot manual control")
+        # Arduino Nano обычно перезагружается при открытии Serial.
+        time.sleep(2.0)
 
-    print("Controls:")
-    print("M       - enable manual mode")
-    print("U       - return to automatic/waiting mode")
-    print("W/A/S/D - hold keys to move")
-    print("SPACE   - stop")
-    print("ESC     - quit")
-    print("-------------------------------------")
+        pygame.init()
+        screen = pygame.display.set_mode((500, 250))
+        pygame.display.set_caption("Robot manual control")
 
-    running = True
-    manual_enabled = False
+        clock = pygame.time.Clock()
 
-    last_send_time = 0.0
-    last_command = ""
+        print("Controls:")
+        print("W/A/S/D - move")
+        print("SPACE - stop")
+        print("M - send manual mode command")
+        print("U - send waiting/auto mode command")
+        print("ESC - quit")
+        print("--------------------------------")
 
-    try:
-        while running:
-            now = time.time()
+        last_sent_command = None
+        last_flush_time = time.time()
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
+        if AUTO_SEND_MANUAL_MODE:
+            send_command(ser, "m")
+            last_sent_command = "m"
+            print("sent: m")
 
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
+        running = True
+
+        try:
+            while running:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
                         running = False
 
-                    elif event.key == pygame.K_m:
-                        send_line(ser, "m")
-                        manual_enabled = True
-                        last_send_time = now
-                        last_command = ""
-                        print("sent: m")
+                    elif event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_ESCAPE:
+                            running = False
 
-                    elif event.key == pygame.K_u:
-                        send_line(ser, "u")
-                        manual_enabled = False
-                        last_send_time = now
-                        last_command = ""
-                        print("sent: u")
+                        elif event.key == pygame.K_m:
+                            send_command(ser, "m")
+                            last_sent_command = "m"
+                            print("sent: m")
 
-                    elif event.key == pygame.K_SPACE:
-                        send_line(ser, "x")
-                        last_send_time = now
-                        last_command = ""
-                        print("sent: x")
+                        elif event.key == pygame.K_u:
+                            send_command(ser, "u")
+                            last_sent_command = "u"
+                            print("sent: u")
 
-            if manual_enabled:
+                        elif event.key == pygame.K_SPACE:
+                            send_command(ser, "x")
+                            last_sent_command = "x"
+                            print("sent: x")
+
+                # 1. Считываем текущее состояние клавиатуры.
                 keys = pygame.key.get_pressed()
                 command = build_command(keys)
 
-                if command != "":
-                    # While at least one WASD key is held,
-                    # repeatedly send the current keyboard state.
-                    if now - last_send_time >= SEND_INTERVAL:
-                        send_line(ser, command)
-                        last_send_time = now
+                # 2. Отправляем только если команда изменилась.
+                # Поэтому команды не накапливаются одинаковыми копиями.
+                if command != last_sent_command:
+                    send_command(ser, command)
+                    last_sent_command = command
+                    print("sent:", command)
 
-                        if command != last_command:
-                            print("sent:", command)
-                            last_command = command
+                # 3. Быстро забираем все логи из Serial и пишем в CSV.
+                read_logs_to_file(ser, log_file)
 
-                else:
-                    # If the robot was moving and now all WASD keys are released,
-                    # send stop command only once.
-                    if last_command != "":
-                        send_line(ser, "x")
-                        last_send_time = now
-                        last_command = ""
-                        print("sent: x")
+                # 4. Периодически сбрасываем файл на диск.
+                now = time.time()
+                if now - last_flush_time >= 0.2:
+                    log_file.flush()
+                    last_flush_time = now
 
-            read_arduino_logs(ser)
+                screen.fill((30, 30, 30))
+                pygame.display.flip()
 
-            screen.fill((30, 30, 30))
-            pygame.display.flip()
+                clock.tick(FPS)
 
-            time.sleep(0.002)
-
-    finally:
-        try:
-            send_line(ser, "x")
-            time.sleep(0.05)
-            ser.close()
         finally:
+            send_command(ser, "x")
+            time.sleep(0.05)
+
+            log_file.flush()
+            ser.close()
             pygame.quit()
 
 
