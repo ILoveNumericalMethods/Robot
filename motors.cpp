@@ -37,10 +37,10 @@ void Motors::begin() {
     stop();
 }
 
-void Motors::drive(const MotorCommand& command) {
+void Motors::drive(const MotorCommand& current_command) {
     digitalWrite(PIN_STBY, HIGH);
-    drive_left(command.left);
-    drive_right(command.right);
+    drive_left(current_command.left);
+    drive_right(current_command.right);
 }
 
 void Motors::stop() {

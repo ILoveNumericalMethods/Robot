@@ -10,6 +10,10 @@ struct SensorData {
     int front_right_cm;
     int rear_right_cm;
 
+    int front_delta;
+    int front_right_delta;
+    int rear_right_delta;
+
     SensorData();
 };
 

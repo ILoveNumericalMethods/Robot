@@ -21,7 +21,8 @@ struct Controller {
     String mode;
     ManualKeys keys;
     bool warning;
-    MotorCommand command;
+    MotorCommand current_command;
+    MotorCommand previous_command;
 
     Controller();
 

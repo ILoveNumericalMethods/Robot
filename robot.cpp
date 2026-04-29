@@ -38,7 +38,7 @@ void Robot::compute_command() {
 }
 
 void Robot::drive_motors() {
-    motors.drive(controller.command);
+    motors.drive(controller.current_command);
 }
 
 void Robot::log_state() {

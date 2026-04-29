@@ -5,7 +5,10 @@
 SensorData::SensorData()
     : front_cm(INVALID_DISTANCE),
       front_right_cm(INVALID_DISTANCE),
-      rear_right_cm(INVALID_DISTANCE) {}
+      rear_right_cm(INVALID_DISTANCE),
+      front_delta(INVALID_DISTANCE),
+      front_right_delta(INVALID_DISTANCE),
+      rear_right_delta(INVALID_DISTANCE) {}
 
 Sensors::Sensors()
     : data(),
@@ -20,12 +23,19 @@ void Sensors::begin() {
 }
 
 void Sensors::update() {
+    int temp_dist = front_sensor.distance();
+
+    data.front_delta = temp_dist - data.front_cm;
     data.front_cm = front_sensor.distance();
     delay(TIME_BETWEEN_SENSORS);
 
-    data.front_right_cm = front_right_sensor.distance();
+    temp_dist = front_right_sensor.distance();
+    data.front_right_delta = temp_dist - data.front_right_cm;
+    data.front_right_cm = temp_dist;
     delay(TIME_BETWEEN_SENSORS);
 
-    data.rear_right_cm = rear_right_sensor.distance();
+    temp_dist = rear_right_sensor.distance();
+    data.rear_right_delta = temp_dist - data.rear_right_cm;
+    data.rear_right_cm = temp_dist;
     delay(TIME_BETWEEN_SENSORS);
 }

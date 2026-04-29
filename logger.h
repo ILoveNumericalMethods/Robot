@@ -10,5 +10,7 @@ struct Logger {
 
     void begin();
     void print_header();
+    void print_header_dataset();
     void log(const Sensors& sensors, const Controller& controller);
+    void log_dataset(const Sensors& sensors, const Controller& controller);
 };

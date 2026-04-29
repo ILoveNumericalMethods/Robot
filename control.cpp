@@ -21,13 +21,15 @@ bool ManualKeys::empty() const {
 Controller::Controller() {
     mode = "WAITING";
     warning = false;
-    command = MotorCommand(0, 0);
+    current_command = MotorCommand(0, 0);
+    previous_command = MotorCommand(0, 0);
 }
 
 void Controller::begin() {
     mode = "WAITING";
     warning = false;
-    command = MotorCommand(0, 0);
+    current_command = MotorCommand(0, 0);
+    previous_command = MotorCommand(0, 0);
     keys.clear();
 }
 
@@ -62,14 +64,16 @@ void Controller::handle_serial_line(const String& line) {
     if (line == "m") {
         mode = "MANUAL";
         keys.clear();
-        command = MotorCommand(0, 0);
+        previous_command = current_command;
+        current_command = MotorCommand(0, 0);
         return;
     }
 
     if (line == "u") {
         mode = "WAITING";
         keys.clear();
-        command = MotorCommand(0, 0);
+        previous_command = current_command;
+        current_command = MotorCommand(0, 0);
         return;
     }
 
@@ -79,7 +83,8 @@ void Controller::handle_serial_line(const String& line) {
 
     if (line == "x") {
         keys.clear();
-        command = MotorCommand(0, 0);
+        previous_command = current_command;
+        current_command = MotorCommand(0, 0);
         return;
     }
 
@@ -133,56 +138,67 @@ void Controller::update_mode(const Sensors& sensors) {
 
 void Controller::compute_manual_command() {
     if (keys.empty()) {
-        command = MotorCommand(0, 0);
+        previous_command = current_command;
+        current_command = MotorCommand(0, 0);
         return;
     }
 
     if ((keys.w && keys.s) || (keys.a && keys.d)) {
-        command = MotorCommand(0, 0);
+        previous_command = current_command;
+        current_command = MotorCommand(0, 0);
         return;
     }
 
     if (keys.w && keys.d) {
-        command = MotorCommand(140, 80);
+        previous_command = current_command;
+        current_command = MotorCommand(140, 80);
         return;
     }
 
     if (keys.w && keys.a) {
-        command = MotorCommand(80, 140);
+        previous_command = current_command;
+        current_command = MotorCommand(80, 140);
         return;
     }
 
     if (keys.s && keys.d) {
-        command = MotorCommand(-140, -80);
+        previous_command = current_command;
+        current_command = MotorCommand(-140, -80);
         return;
     }
 
     if (keys.s && keys.a) {
-        command = MotorCommand(-80, -140);
+        previous_command = current_command;
+        current_command = MotorCommand(-80, -140);
         return;
     }
 
     if (keys.w) {
-        command = MotorCommand(120, 120);
+        previous_command = current_command;
+        current_command = MotorCommand(120, 120);
         return;
     }
 
     if (keys.s) {
-        command = MotorCommand(-100, -100);
+        previous_command = current_command;
+        current_command = MotorCommand(-100, -100);
         return;
     }
 
     if (keys.a) {
-        command = MotorCommand(-90, 90);
+        previous_command = current_command;
+        current_command = MotorCommand(-70, 70);
         return;
     }
 
     if (keys.d) {
-        command = MotorCommand(90, -90);
+        previous_command = current_command;
+        current_command = MotorCommand(70, -70);
         return;
     }
 
-    command = MotorCommand(0, 0);
+    previous_command = current_command;
+    current_command = MotorCommand(0, 0);
 }
 
 void Controller::compute_command(const Sensors& sensors) {
@@ -192,27 +208,32 @@ void Controller::compute_command(const Sensors& sensors) {
     }
 
     if (mode == "WAITING") {
-        command = MotorCommand(0, 0);
+        previous_command = current_command;
+        current_command = MotorCommand(0, 0);
         return;
     }
 
     if (mode == "FOLLOW") {
         AiController ai;
-        command = ai.predict(sensors.data, sensors.data);
+        previous_command = current_command;
+        current_command = ai.predict(sensors.data, sensors.data);
         return;
     }
 
     if (mode == "STOP") {
-        command = MotorCommand(0, 0);
+        previous_command = current_command;
+        current_command = MotorCommand(0, 0);
         return;
     }
 
     if (mode == "FORWARD") {
-        command = MotorCommand(90, 90);
+        previous_command = current_command;
+        current_command = MotorCommand(120, 120);
         return;
     }
 
-    command = MotorCommand(0, 0);
+    previous_command = current_command;
+    current_command = MotorCommand(0, 0);
 }
 
 bool Controller::danger_position(const Sensors& sensors) {
