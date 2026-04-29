@@ -26,7 +26,7 @@ void Sensors::update() {
     int temp_dist = front_sensor.distance();
 
     data.front_delta = temp_dist - data.front_cm;
-    data.front_cm = front_sensor.distance();
+    data.front_cm = temp_dist;
     delay(TIME_BETWEEN_SENSORS);
 
     temp_dist = front_right_sensor.distance();
