@@ -22,15 +22,16 @@ Controller::Controller() {
     mode = "WAITING";
     warning = false;
     current_command = MotorCommand(0, 0);
-    previous_command = MotorCommand(0, 0);
+    previous_command = MotorCommand(120, 120);
 }
 
 void Controller::begin() {
     mode = "WAITING";
     warning = false;
     current_command = MotorCommand(0, 0);
-    previous_command = MotorCommand(0, 0);
+    previous_command = MotorCommand(120, 120);
     keys.clear();
+    ver33.begin();
 }
 
 void Controller::handle_serial() {
@@ -214,9 +215,8 @@ void Controller::compute_command(const Sensors& sensors) {
     }
 
     if (mode == "FOLLOW") {
-        AiController ai;
         previous_command = current_command;
-        current_command = ai.predict(sensors.data, sensors.data);
+        current_command = ver33.predict(sensors, previous_command);
         return;
     }
 

@@ -8,7 +8,7 @@ import serial
 PORT = "COM12"
 BAUD = 115200
 
-LOG_FILE = "log.csv"
+LOG_FILE = "robot_log.csv"
 
 FPS = 100
 AUTO_SEND_MANUAL_MODE = True
@@ -48,7 +48,8 @@ def read_logs_to_file(ser, file):
 
     if n > 0:
         data = ser.read(n)
-        file.write(data)
+        #file.write(data)
+        print(data.decode("utf-8", errors="replace"), end="")
         return n
 
     return 0

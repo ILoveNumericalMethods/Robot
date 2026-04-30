@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
-
+#include "ai.h"
 #include "motors.h"
 #include "sensors.h"
 
@@ -23,6 +23,7 @@ struct Controller {
     bool warning;
     MotorCommand current_command;
     MotorCommand previous_command;
+    RobotBrain ver33;
 
     Controller();
 
