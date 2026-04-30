@@ -9,7 +9,7 @@ void Robot::begin() {
     controller.begin();
     motors.begin();
     logger.begin();
-    logger.print_header();
+    logger.print_header_dataset();
 }
 
 void Robot::update() {
@@ -42,5 +42,5 @@ void Robot::drive_motors() {
 }
 
 void Robot::log_state() {
-    logger.log(sensors, controller);
+    logger.log_dataset(sensors, controller);
 }

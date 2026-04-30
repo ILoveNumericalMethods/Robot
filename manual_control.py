@@ -8,7 +8,7 @@ import serial
 PORT = "COM12"
 BAUD = 115200
 
-LOG_FILE = "robot_log.csv"
+LOG_FILE = "log.csv"
 
 FPS = 100
 AUTO_SEND_MANUAL_MODE = True
