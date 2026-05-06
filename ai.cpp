@@ -6,64 +6,143 @@ RobotBrain::RobotBrain() {
     begin();
 }
 
+
 void RobotBrain::begin() {
     for (int i = 0; i < 8; i++) {
         h[i] = 0.0f;
     }
 }
 
+
 float RobotBrain::sigmoid(float x) {
     return 1.0f / (1.0f + exp(-x));
 }
 
-float RobotBrain::crop_distance(int distance) {
-    return static_cast<float>(distance) / MAX_DISTANCE;
+
+float RobotBrain::norm_distance(int x) {
+    if (x <= 80) {
+        return 0.5f * static_cast<float>(x) / 80.0f;
+    }
+
+    return 0.5f + 0.5f * static_cast<float>(x - 80) / 320.0f;
 }
 
 
-void RobotBrain::gru_step(const Sensors& sensors, const MotorCommand& previous_command) {
-    float input[11];
-    input[0] = crop_distance(sensors.data.front_cm);
-    input[1] = crop_distance(sensors.data.front_delta);
-    input[2] = crop_distance(sensors.data.front_right_cm);
-    input[3] = crop_distance(sensors.data.front_right_delta);
-    input[4] = crop_distance(sensors.data.rear_right_cm);
-    input[5] = crop_distance(sensors.data.rear_right_delta);
-    
-    if (previous_command.left == -70 && previous_command.right == 70) {   
-        input[6] = 1.0f;
-        input[7] = 0.0f;
-        input[8] = 0.0f;
-        input[9] = 0.0f;
-        input[10] = 0.0f;
+float RobotBrain::norm_delta(int x) {
+    int sign = 1;
 
-    } else if (previous_command.left == 80 && previous_command.right == 140) {
-        input[6] = 0.0f;
-        input[7] = 1.0f;
-        input[8] = 0.0f;
-        input[9] = 0.0f;
-        input[10] = 0.0f;
-
-    } else if (previous_command.left == 120 && previous_command.right == 120) {
-        input[6] = 0.0f;
-        input[7] = 0.0f;
-        input[8] = 1.0f;
-        input[9] = 0.0f;
-        input[10] = 0.0f;
-    } else if (previous_command.left == 140 && previous_command.right == 80) {
-        input[6] = 0.0f;
-        input[7] = 0.0f;
-        input[8] = 0.0f;
-        input[9] = 1.0f;
-        input[10] = 0.0f;
-    } else if (previous_command.left == 70 && previous_command.right == -70) {
-        input[6] = 0.0f;
-        input[7] = 0.0f;
-        input[8] = 0.0f;
-        input[9] = 0.0f;
-        input[10] = 1.0f;
+    if (x < 0) {
+        sign = -1;
+        x = -x;
     }
-    
+
+    float norm_abs;
+
+    if (x <= 20) {
+        norm_abs = 0.5f * static_cast<float>(x) / 20.0f;
+    } else {
+        norm_abs = 0.5f + 0.5f * static_cast<float>(x - 20) / 380.0f;
+    }
+
+    return static_cast<float>(sign) * norm_abs;
+}
+
+float RobotBrain::norm_angle(int x) {
+    int sign = 1;
+
+    if (x < 0) {
+        sign = -1;
+        x = -x;
+    }
+
+    float norm_abs;
+
+    if (x <= 40) {
+        norm_abs = 0.5f * static_cast<float>(x) / 40.0f;
+    } else {
+        norm_abs = 0.5f + 0.5f * static_cast<float>(x - 40) / 360.0f;
+    }
+
+    return static_cast<float>(sign) * norm_abs;
+}
+
+float RobotBrain::norm_wall(float x) {
+    int sign = 1;
+
+    if (x < 0) {
+        sign = -1;
+        x = -x;
+    }
+
+    float norm_abs;
+
+    if (x <= 20) {
+        norm_abs = 0.5f * x / 20.0f;
+    } else {
+        norm_abs = 0.5f + 0.5f * x - 20.0f / 380.0f;
+    }
+
+    return static_cast<float>(sign) * norm_abs;
+}
+
+
+
+bool RobotBrain::is_command(const MotorCommand& command, int left, int right) {
+    return command.left == left && command.right == right;
+}
+
+
+void RobotBrain::fill_previous_command_input(const MotorCommand& previous_command, float input[]) {
+    input[6] = 0.0f;
+    input[7] = 0.0f;
+    input[8] = 0.0f;
+
+    if (is_command(previous_command, 60, 120) || is_command(previous_command, 80, 140)) {
+        input[6] = 1.0f;
+        return;
+    }
+
+    if (is_command(previous_command, 120, 120) || is_command(previous_command, 100, 100)
+    ) {
+        input[7] = 1.0f;
+        return;
+    }
+
+    if (is_command(previous_command, 140, 80) || is_command(previous_command, 120, 60)) {
+        input[9] = 1.0f;
+        return;
+    }
+
+    input[7] = 1.0f;
+}
+
+
+void RobotBrain::gru_step(
+    const Sensors& sensors,
+    const MotorCommand& previous_command
+) {
+    float input[9];
+
+    input[0] = norm_distance(sensors.data.front_cm);
+    input[1] = norm_delta(sensors.data.front_delta);
+
+    input[2] = norm_distance(sensors.data.front_right_cm);
+    input[3] = norm_delta(sensors.data.front_right_delta);
+
+    input[4] = norm_distance(sensors.data.rear_right_cm);
+    input[5] = norm_delta(sensors.data.rear_right_delta);
+
+    //input[6] = norm_angle(sensors.data.right_angle);
+    //input[7] = norm_wall(sensors.data.distance_to_wall);
+
+    fill_previous_command_input(previous_command, input);
+
+    //debug
+    //input[8]=0;
+    //input[9]=1;
+    //input[10]=0;
+    //debug
+
     float r[8];
     float z[8];
     float n[8];
@@ -73,7 +152,7 @@ void RobotBrain::gru_step(const Sensors& sensors, const MotorCommand& previous_c
         float sum_r = 0.0f;
         float sum_z = 0.0f;
 
-        for (int j = 0; j < 11; j++) {
+        for (int j = 0; j < 9; j++) {
             sum_r += pgm_read_float(&GRU_WEIGHT_IH[i][j]) * input[j];
             sum_z += pgm_read_float(&GRU_WEIGHT_IH[8 + i][j]) * input[j];
         }
@@ -97,7 +176,7 @@ void RobotBrain::gru_step(const Sensors& sensors, const MotorCommand& previous_c
         float input_part = 0.0f;
         float hidden_part = 0.0f;
 
-        for (int j = 0; j < 11; j++) {
+        for (int j = 0; j < 9; j++) {
             input_part += pgm_read_float(&GRU_WEIGHT_IH[16 + i][j]) * input[j];
         }
 
@@ -124,41 +203,43 @@ void RobotBrain::gru_step(const Sensors& sensors, const MotorCommand& previous_c
 
 int RobotBrain::compute_action() {
     float best_score = -1000000.0f;
-    int best_action = 0;
+    int best_action = 1; 
 
-    Serial.print(',');
-    for (int action = 0; action < 5; action++) {
+    for (int action = 0; action < 3; action++) {
         float score = pgm_read_float(&HEAD_BIAS[action]);
 
         for (int j = 0; j < 8; j++) {
             score += pgm_read_float(&HEAD_WEIGHT[action][j]) * h[j];
         }
+
         if (score > best_score) {
             best_score = score;
             best_action = action;
         }
-        Serial.print(score);
-        Serial.print(',');
+
+       // Serial.print(score);
+        //Serial.print(',');
     }
 
     return best_action;
 }
 
 
-
-MotorCommand RobotBrain::predict(const Sensors& sensors, const MotorCommand& previous_command){
+MotorCommand RobotBrain::predict(
+    const Sensors& sensors,
+    const MotorCommand& previous_command
+) {
     gru_step(sensors, previous_command);
+
     int action = compute_action();
-    Serial.println(action);
-    if (action == 0){
-        return MotorCommand(-70, 70); 
-    } else if (action == 1){
-        return MotorCommand(80, 140);
-    } else if (action == 2){
-        return MotorCommand(120, 120);
-    } else if (action == 3){
-        return MotorCommand(140, 80);
-    } else {
-        return MotorCommand(70, -70);
+
+    if (action == 0) {
+        return MotorCommand(60, 140);   // wa
     }
-}    
+
+    if (action == 1) {
+        return MotorCommand(120, 120);  // w
+    }
+
+    return MotorCommand(140, 60);       // wd
+}

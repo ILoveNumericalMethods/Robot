@@ -8,7 +8,8 @@ import serial
 PORT = "COM12"
 BAUD = 115200
 
-LOG_FILE = "robot_log.csv"
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+LOG_FILE = os.path.join(SCRIPT_DIR, "log.csv")
 
 FPS = 100
 AUTO_SEND_MANUAL_MODE = True
@@ -33,8 +34,6 @@ def build_command(keys):
 
 
 def send_command(ser, command):
-    # Удаляем то, что еще не успело уйти из буфера компьютера.
-    # Это не очищает буфер Arduino, но уменьшает накопление команд со стороны Python.
     try:
         ser.reset_output_buffer()
     except serial.SerialException:
@@ -43,22 +42,29 @@ def send_command(ser, command):
     ser.write((command + "\n").encode("utf-8"))
 
 
-def read_logs_to_file(ser, file):
+def read_logs_to_file(ser, log_file):
     n = ser.in_waiting
 
-    if n > 0:
-        data = ser.read(n)
-        #file.write(data)
-        print(data.decode("utf-8", errors="replace"), end="")
-        return n
+    if n <= 0:
+        return 0
 
-    return 0
+    data = ser.read(n)
+    text = data.decode("utf-8", errors="replace")
+
+    # Пишем в файл
+    log_file.write(text)
+    log_file.flush()
+
+    # Одновременно выводим в терминал
+    print(text, end="")
+
+    return n
 
 
 def main():
-    print("Log file:", os.path.abspath(LOG_FILE))
+    print("Log file:", LOG_FILE)
 
-    with open(LOG_FILE, "wb") as log_file:
+    with open(LOG_FILE, "w", encoding="utf-8", newline="") as log_file:
         ser = serial.Serial(PORT, BAUD, timeout=0)
 
         # Arduino Nano обычно перезагружается при открытии Serial.
@@ -79,7 +85,6 @@ def main():
         print("--------------------------------")
 
         last_sent_command = None
-        last_flush_time = time.time()
 
         if AUTO_SEND_MANUAL_MODE:
             send_command(ser, "m")
@@ -118,20 +123,13 @@ def main():
                 command = build_command(keys)
 
                 # 2. Отправляем только если команда изменилась.
-                # Поэтому команды не накапливаются одинаковыми копиями.
                 if command != last_sent_command:
                     send_command(ser, command)
                     last_sent_command = command
                     print("sent:", command)
 
-                # 3. Быстро забираем все логи из Serial и пишем в CSV.
+                # 3. Забираем все логи из Serial, пишем в файл и печатаем в терминал.
                 read_logs_to_file(ser, log_file)
-
-                # 4. Периодически сбрасываем файл на диск.
-                now = time.time()
-                if now - last_flush_time >= 0.2:
-                    log_file.flush()
-                    last_flush_time = now
 
                 screen.fill((30, 30, 30))
                 pygame.display.flip()
@@ -139,8 +137,11 @@ def main():
                 clock.tick(FPS)
 
         finally:
-            send_command(ser, "x")
-            time.sleep(0.05)
+            try:
+                send_command(ser, "x")
+                time.sleep(0.05)
+            except Exception:
+                pass
 
             log_file.flush()
             ser.close()

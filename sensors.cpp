@@ -8,7 +8,9 @@ SensorData::SensorData()
       rear_right_cm(INVALID_DISTANCE),
       front_delta(INVALID_DISTANCE),
       front_right_delta(INVALID_DISTANCE),
-      rear_right_delta(INVALID_DISTANCE) {}
+      rear_right_delta(INVALID_DISTANCE),
+      right_angle(INVALID_DISTANCE),
+      distance_to_wall(INVALID_DISTANCE) {}
 
 Sensors::Sensors()
     : data(),
@@ -38,4 +40,8 @@ void Sensors::update() {
     data.rear_right_delta = temp_dist - data.rear_right_cm;
     data.rear_right_cm = temp_dist;
     delay(TIME_BETWEEN_SENSORS);
+
+    data.right_angle = data.front_right_cm - data.rear_right_cm;
+    data.distance_to_wall = static_cast<float>(data.front_right_cm + data.rear_right_cm) * 0.5f * 0.7071f - 30.0f  ;
+
 }

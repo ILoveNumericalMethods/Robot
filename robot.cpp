@@ -9,15 +9,16 @@ void Robot::begin() {
     controller.begin();
     motors.begin();
     logger.begin();
-    logger.print_header_dataset_verify();
+    //logger.print_header_dataset_verify();
+    logger.print_header_dataset();
 }
 
 void Robot::update() {
     read_input();
     read_sensors();
     update_mode();
-    log_dataset_verify();
     compute_command();
+    log_state();
     drive_motors();
 }
 
@@ -42,5 +43,6 @@ void Robot::drive_motors() {
 }
 
 void Robot::log_state() {
-    logger.log(sensors, controller);
+    //logger.log(sensors, controller);
+    logger.log_dataset(sensors, controller);
 }

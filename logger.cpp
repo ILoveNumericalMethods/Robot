@@ -1,12 +1,57 @@
 #include "logger.h"
 
+
+bool Logger::is_command(const MotorCommand& command, int left, int right) {
+    return command.left == left && command.right == right;
+}
+
+void Logger::print_command(const MotorCommand& command) {
+    if (is_command(command, -70, 70) || is_command(command, 80, 140) || is_command(command, 60, 120) || is_command(command, 60, 140)) {
+        Serial.print(1);
+        Serial.print(',');
+        Serial.print(0);
+        Serial.print(',');
+        Serial.print(0);
+        return;
+    }
+
+    
+    if (is_command(command, 120, 120) || is_command(command, 100, 100)) {
+        Serial.print(0);
+        Serial.print(',');
+        Serial.print(1);
+        Serial.print(',');
+        Serial.print(0);
+        return;
+    }
+
+    
+    if (is_command(command, 140, 80) || is_command(command, 70, -70) || is_command(command, 120, 60) || is_command(command, 140, 60)) {
+        Serial.print(0);
+        Serial.print(',');
+        Serial.print(0);
+        Serial.print(',');
+        Serial.print(1);
+        return;
+    }
+
+    Serial.print(-1);
+    Serial.print(',');
+    Serial.print(-1);
+    Serial.print(',');
+    Serial.print(-1);
+}
+
+
 void Logger::begin() {
     start_time = millis();
 }
 
+
 void Logger::print_header() {
     Serial.println("time,mode,sensF,sensFR,sensRR,motorL,motorR");
 }
+
 
 void Logger::log(const Sensors& sensors, const Controller& controller) {
     const unsigned long time = millis() - start_time;
@@ -26,176 +71,52 @@ void Logger::log(const Sensors& sensors, const Controller& controller) {
     Serial.println(controller.current_command.right);
 }
 
+
 void Logger::print_header_dataset() {
-    Serial.println("front,front_delta,front_right,front_right_delta,rear_right,rear_right_delta,mode1,mode2,mode3,mode4,mode5,prev_mode1,prev_mode2,prev_mode3,prev_mode4,prev_mode5");
+    Serial.println("front,front_delta,front_right,front_right_delta,rear_right,rear_right_delta,right_angle,wall_error,mode1,mode2,mode3,prev_mode1,prev_mode2,prev_mode3");
 }
 
-void Logger::print_header_dataset_verify() {
-    Serial.println("front,front_delta,front_right,front_right_delta,rear_right,rear_right_delta,mode1,mode2,mode3,mode4,mode5,prev_mode1,prev_mode2,prev_mode3,prev_mode4,prev_mode5,ans1,ans2,ans3,ans4,ans5");
-}
+
+//void Logger::print_header_dataset_verify() {
+//    print_header_dataset();
+//}
+
 
 void Logger::log_dataset(const Sensors& sensors, const Controller& controller) {
     
-    Serial.print("\n");
     Serial.print(sensors.data.front_cm);
     Serial.print(',');
+
     Serial.print(sensors.data.front_delta);
     Serial.print(',');
+
     Serial.print(sensors.data.front_right_cm);
     Serial.print(',');
+
     Serial.print(sensors.data.front_right_delta);
     Serial.print(',');
+
     Serial.print(sensors.data.rear_right_cm);
     Serial.print(',');
+
     Serial.print(sensors.data.rear_right_delta);
     Serial.print(',');
 
+    Serial.print(sensors.data.right_angle);
+    Serial.print(',');
 
-    if (controller.current_command.left == -70 && controller.current_command.right == 70) {   
-        Serial.print(1);
-        Serial.print(',');
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(0);
-        
+    Serial.print(sensors.data.distance_to_wall);
+    Serial.print(',');
 
-    } else if (controller.current_command.left == 80 && controller.current_command.right == 140) {
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(1);
-        Serial.print(',');
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(0);
-        
+    print_command(controller.current_command);
+    Serial.print(',');
 
-    } else if (controller.current_command.left == 120 && controller.current_command.right == 120) {
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(1);
-        Serial.print(',');
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(0);
-        
-    } else if (controller.current_command.left == 140 && controller.current_command.right == 80) {
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(1);
-        Serial.print(',');
-        Serial.print(0);
-        
-    } else if (controller.current_command.left == 70 && controller.current_command.right == -70) {
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(1);
-        Serial.print(',');
-        Serial.print(1);
-        
-    } else {
-        Serial.print(-1);
-        Serial.print(',');
-        Serial.print(-1);
-        Serial.print(',');
-        Serial.print(-1);
-        Serial.print(',');
-        Serial.print(-1);
-        Serial.print(',');
-        Serial.print(-1);
-        
-    }
+    print_command(controller.previous_command);
 
-    if (controller.previous_command.left == -70 && controller.previous_command.right == 70) {   
-        Serial.print(1);
-        Serial.print(',');
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(0);
-        
-
-    } else if (controller.previous_command.left == 80 && controller.previous_command.right == 140) {
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(1);
-        Serial.print(',');
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(0);
-        
-
-    } else if (controller.previous_command.left == 120 && controller.previous_command.right == 120) {
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(1);
-        Serial.print(',');
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(0);
-        
-    } else if (controller.previous_command.left == 140 && controller.previous_command.right == 80) {
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(1);
-        Serial.print(',');
-        Serial.print(0);
-        
-    } else if (controller.previous_command.left == 70 && controller.previous_command.right == -70) {
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(0);
-        Serial.print(',');
-        Serial.print(1);
-        Serial.print(',');
-        Serial.print(1);
-        
-    } else {
-        Serial.print(-1);
-        Serial.print(',');
-        Serial.print(-1);
-        Serial.print(',');
-        Serial.print(-1);
-        Serial.print(',');
-        Serial.print(-1);
-        Serial.print(',');
-        Serial.print(-1);
-        
-    }
-}
-
-void Logger::log_dataset_verify(const Sensors& sensors, const Controller& controller) {
-  log_dataset(sensors, controller);
-  Serial.print(',');
-
+    Serial.println();
 }
 
 
+//void Logger::log_dataset_verify(const Sensors& sensors, const Controller& controller) {
+//    log_dataset(sensors, controller);
+//}

@@ -14,6 +14,10 @@ struct SensorData {
     int front_right_delta;
     int rear_right_delta;
 
+    int right_angle; 
+    float distance_to_wall;
+        
+
     SensorData();
 };
 

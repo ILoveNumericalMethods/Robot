@@ -152,25 +152,25 @@ void Controller::compute_manual_command() {
 
     if (keys.w && keys.d) {
         previous_command = current_command;
-        current_command = MotorCommand(140, 80);
+        current_command = MotorCommand(140, 60);
         return;
     }
 
     if (keys.w && keys.a) {
         previous_command = current_command;
-        current_command = MotorCommand(80, 140);
+        current_command = MotorCommand(60, 140);
         return;
     }
 
     if (keys.s && keys.d) {
         previous_command = current_command;
-        current_command = MotorCommand(-140, -80);
+        current_command = MotorCommand(-140, -60);
         return;
     }
 
     if (keys.s && keys.a) {
         previous_command = current_command;
-        current_command = MotorCommand(-80, -140);
+        current_command = MotorCommand(-60, -140);
         return;
     }
 
