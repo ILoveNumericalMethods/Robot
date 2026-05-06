@@ -109,7 +109,7 @@ void RobotBrain::fill_previous_command_input(const MotorCommand& previous_comman
     }
 
     if (is_command(previous_command, 140, 80) || is_command(previous_command, 120, 60)) {
-        input[9] = 1.0f;
+        input[8] = 1.0f;
         return;
     }
 
