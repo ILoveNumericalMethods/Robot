@@ -49,7 +49,7 @@ void Logger::begin() {
 
 
 void Logger::print_header() {
-    Serial.println("time,mode,sensF,sensFR,sensRR,motorL,motorR");
+    Serial.println("time,mode,sensF,,sensFL,sensFR,sensRR,motorL,motorR");
 }
 
 
@@ -60,11 +60,13 @@ void Logger::log(const Sensors& sensors, const Controller& controller) {
     Serial.print(',');
     Serial.print(controller.mode);
     Serial.print(',');
-    Serial.print(sensors.data.front_cm);
+    Serial.print(sensors.data.front);
     Serial.print(',');
-    Serial.print(sensors.data.front_right_cm);
+    Serial.print(sensors.data.front_left);
     Serial.print(',');
-    Serial.print(sensors.data.rear_right_cm);
+    Serial.print(sensors.data.front_right);
+    Serial.print(',');
+    Serial.print(sensors.data.rear_right);
     Serial.print(',');
     Serial.print(controller.current_command.left);
     Serial.print(',');
@@ -73,7 +75,7 @@ void Logger::log(const Sensors& sensors, const Controller& controller) {
 
 
 void Logger::print_header_dataset() {
-    Serial.println("front,front_delta,front_right,front_right_delta,rear_right,rear_right_delta,right_angle,wall_error,mode1,mode2,mode3,prev_mode1,prev_mode2,prev_mode3");
+    Serial.println("front,prev_front,front_left,prev_front_left,front_right,prev_front_right,rear_right,prev_rear_right,mode1,mode2,mode3,prev_mode1,prev_mode2,prev_mode3");
 }
 
 
@@ -84,28 +86,28 @@ void Logger::print_header_dataset() {
 
 void Logger::log_dataset(const Sensors& sensors, const Controller& controller) {
     
-    Serial.print(sensors.data.front_cm);
+    Serial.print(sensors.data.front);
     Serial.print(',');
 
-    Serial.print(sensors.data.front_delta);
+    Serial.print(sensors.data.prev_front);
     Serial.print(',');
 
-    Serial.print(sensors.data.front_right_cm);
+    Serial.print(sensors.data.front_left);
     Serial.print(',');
 
-    Serial.print(sensors.data.front_right_delta);
+    Serial.print(sensors.data.prev_front_left);
     Serial.print(',');
 
-    Serial.print(sensors.data.rear_right_cm);
+    Serial.print(sensors.data.front_right);
     Serial.print(',');
 
-    Serial.print(sensors.data.rear_right_delta);
+    Serial.print(sensors.data.prev_front_right);
     Serial.print(',');
 
-    Serial.print(sensors.data.right_angle);
+    Serial.print(sensors.data.rear_right);
     Serial.print(',');
 
-    Serial.print(sensors.data.distance_to_wall);
+    Serial.print(sensors.data.prev_rear_right);
     Serial.print(',');
 
     print_command(controller.current_command);

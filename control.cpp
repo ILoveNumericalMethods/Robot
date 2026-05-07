@@ -21,8 +21,8 @@ bool ManualKeys::empty() const {
 Controller::Controller() {
     mode = "WAITING";
     warning = false;
+    previous_command = current_command;
     current_command = MotorCommand(0, 0);
-    previous_command = MotorCommand(120, 120);
 }
 
 void Controller::begin() {
@@ -216,7 +216,8 @@ void Controller::compute_command(const Sensors& sensors) {
 
     if (mode == "FOLLOW") {
         previous_command = current_command;
-        current_command = ver33.predict(sensors, previous_command);
+        //current_command = ver33.predict(sensors, previous_command);
+        current_command = MotorCommand(0,0);
         return;
     }
 
@@ -237,13 +238,15 @@ void Controller::compute_command(const Sensors& sensors) {
 }
 
 bool Controller::danger_position(const Sensors& sensors) {
-    return sensors.data.front_cm <= RISE_ERROR_DISTENCE ||
-           sensors.data.rear_right_cm <= RISE_ERROR_DISTENCE ||
-           sensors.data.front_right_cm <= RISE_ERROR_DISTENCE;
+    return sensors.data.front <= RISE_ERROR_DISTENCE ||
+           sensors.data.rear_right <= RISE_ERROR_DISTENCE ||
+           sensors.data.front_right <= RISE_ERROR_DISTENCE ||
+           sensors.data.front_left <= RISE_ERROR_DISTENCE;
 }
 
 bool Controller::wall_is_found(const Sensors& sensors) {
-    return sensors.data.front_cm < MAX_DISTANCE_TO_WALL ||
-           sensors.data.front_right_cm < MAX_DISTANCE_TO_WALL ||
-           sensors.data.rear_right_cm < MAX_DISTANCE_TO_WALL;
+    return sensors.data.front < MAX_DISTANCE_TO_WALL ||
+           sensors.data.front_right < MAX_DISTANCE_TO_WALL ||
+           sensors.data.rear_right < MAX_DISTANCE_TO_WALL || 
+           sensors.data.front_left < MAX_DISTANCE_TO_WALL;
 }

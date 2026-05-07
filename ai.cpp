@@ -8,7 +8,7 @@ RobotBrain::RobotBrain() {
 
 
 void RobotBrain::begin() {
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 16; i++) {
         h[i] = 0.0f;
     }
 }
@@ -97,7 +97,7 @@ void RobotBrain::fill_previous_command_input(const MotorCommand& previous_comman
     input[7] = 0.0f;
     input[8] = 0.0f;
 
-    if (is_command(previous_command, 60, 120) || is_command(previous_command, 80, 140)) {
+    if (is_command(previous_command, 60, 120) || is_command(previous_command, 60, 140)) {
         input[6] = 1.0f;
         return;
     }
@@ -108,7 +108,7 @@ void RobotBrain::fill_previous_command_input(const MotorCommand& previous_comman
         return;
     }
 
-    if (is_command(previous_command, 140, 80) || is_command(previous_command, 120, 60)) {
+    if (is_command(previous_command, 140, 60) || is_command(previous_command, 120, 60)) {
         input[8] = 1.0f;
         return;
     }
@@ -121,19 +121,19 @@ void RobotBrain::gru_step(
     const Sensors& sensors,
     const MotorCommand& previous_command
 ) {
-    float input[9];
+    float input[11];
 
-    input[0] = norm_distance(sensors.data.front_cm);
-    input[1] = norm_delta(sensors.data.front_delta);
+    input[0] = norm_distance(sensors.data.front);
+    input[1] = norm_distance(sensors.data.prev_front);
 
-    input[2] = norm_distance(sensors.data.front_right_cm);
-    input[3] = norm_delta(sensors.data.front_right_delta);
+    input[2] = norm_distance(sensors.data.front_left);
+    input[3] = norm_distance(sensors.data.prev_front_left);
 
-    input[4] = norm_distance(sensors.data.rear_right_cm);
-    input[5] = norm_delta(sensors.data.rear_right_delta);
+    input[4] = norm_distance(sensors.data.front_right);
+    input[5] = norm_delta(sensors.data.prev_front_right);
 
-    //input[6] = norm_angle(sensors.data.right_angle);
-    //input[7] = norm_wall(sensors.data.distance_to_wall);
+    input[6] = norm_distance(sensors.data.rear_right);
+    input[7] = norm_delta(sensors.data.prev_rear_right);
 
     fill_previous_command_input(previous_command, input);
 
@@ -143,59 +143,59 @@ void RobotBrain::gru_step(
     //input[10]=0;
     //debug
 
-    float r[8];
-    float z[8];
-    float n[8];
-    float new_h[8];
+    float r[16];
+    float z[16];
+    float n[16];
+    float new_h[16];
 
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 16; i++) {
         float sum_r = 0.0f;
         float sum_z = 0.0f;
 
         for (int j = 0; j < 9; j++) {
             sum_r += pgm_read_float(&GRU_WEIGHT_IH[i][j]) * input[j];
-            sum_z += pgm_read_float(&GRU_WEIGHT_IH[8 + i][j]) * input[j];
+            sum_z += pgm_read_float(&GRU_WEIGHT_IH[16 + i][j]) * input[j];
         }
 
-        for (int j = 0; j < 8; j++) {
+        for (int j = 0; j < 16; j++) {
             sum_r += pgm_read_float(&GRU_WEIGHT_HH[i][j]) * h[j];
-            sum_z += pgm_read_float(&GRU_WEIGHT_HH[8 + i][j]) * h[j];
+            sum_z += pgm_read_float(&GRU_WEIGHT_HH[16 + i][j]) * h[j];
         }
 
         sum_r += pgm_read_float(&GRU_BIAS_IH[i]);
         sum_r += pgm_read_float(&GRU_BIAS_HH[i]);
 
-        sum_z += pgm_read_float(&GRU_BIAS_IH[8 + i]);
-        sum_z += pgm_read_float(&GRU_BIAS_HH[8 + i]);
+        sum_z += pgm_read_float(&GRU_BIAS_IH[16 + i]);
+        sum_z += pgm_read_float(&GRU_BIAS_HH[16 + i]);
 
         r[i] = sigmoid(sum_r);
         z[i] = sigmoid(sum_z);
     }
 
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 16; i++) {
         float input_part = 0.0f;
         float hidden_part = 0.0f;
 
         for (int j = 0; j < 9; j++) {
-            input_part += pgm_read_float(&GRU_WEIGHT_IH[16 + i][j]) * input[j];
+            input_part += pgm_read_float(&GRU_WEIGHT_IH[32 + i][j]) * input[j];
         }
 
-        input_part += pgm_read_float(&GRU_BIAS_IH[16 + i]);
+        input_part += pgm_read_float(&GRU_BIAS_IH[32 + i]);
 
-        for (int j = 0; j < 8; j++) {
-            hidden_part += pgm_read_float(&GRU_WEIGHT_HH[16 + i][j]) * h[j];
+        for (int j = 0; j < 16; j++) {
+            hidden_part += pgm_read_float(&GRU_WEIGHT_HH[32 + i][j]) * h[j];
         }
 
-        hidden_part += pgm_read_float(&GRU_BIAS_HH[16 + i]);
+        hidden_part += pgm_read_float(&GRU_BIAS_HH[32 + i]);
 
         n[i] = tanh(input_part + r[i] * hidden_part);
     }
 
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 16; i++) {
         new_h[i] = (1.0f - z[i]) * n[i] + z[i] * h[i];
     }
 
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 16; i++) {
         h[i] = new_h[i];
     }
 }
@@ -208,7 +208,7 @@ int RobotBrain::compute_action() {
     for (int action = 0; action < 3; action++) {
         float score = pgm_read_float(&HEAD_BIAS[action]);
 
-        for (int j = 0; j < 8; j++) {
+        for (int j = 0; j < 16; j++) {
             score += pgm_read_float(&HEAD_WEIGHT[action][j]) * h[j];
         }
 

@@ -10,6 +10,8 @@ struct Robot {
     Controller controller;
     Motors motors;
     Logger logger;
+    unsigned long loop_start;
+    unsigned long loop_delay;
 
     void begin();
     void update();

@@ -1,34 +1,29 @@
 #pragma once
-
-#include <Arduino.h>
-#include <iarduino_HC_SR04.h>
-
+#include <NewPing.h>
 #include "pins.h"
 
 struct SensorData {
-    int front_cm;
-    int front_right_cm;
-    int rear_right_cm;
+    int front;
+    int front_right;
+    int front_left;
+    int rear_right;
 
-    int front_delta;
-    int front_right_delta;
-    int rear_right_delta;
-
-    int right_angle; 
-    float distance_to_wall;
-        
+    int prev_front;
+    int prev_front_right;
+    int prev_front_left;
+    int prev_rear_right;
 
     SensorData();
 };
 
-class Sensors {
-public:
-    SensorData data;    
-    iarduino_HC_SR04 front_sensor;
-    iarduino_HC_SR04 front_right_sensor;
-    iarduino_HC_SR04 rear_right_sensor;
+struct Sensors {
+    SensorData data;
+    
+    NewPing front_sensor;
+    NewPing front_left_sensor;
+    NewPing front_right_sensor;
+    NewPing rear_right_sensor;
 
     Sensors();
-    void begin();
     void update();
 };

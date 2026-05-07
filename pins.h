@@ -26,6 +26,10 @@ const int PIN_ECHO_FRONT = A4;
 const int PIN_TRIG_FRONT_RIGHT = A1;  
 const int PIN_ECHO_FRONT_RIGHT = A2;  
 
+// Front-left sensor
+const int PIN_TRIG_FRONT_LEFT = 11;  
+const int PIN_ECHO_FRONT_LEFT = 10;  
+
 // Rear-right sensor
 const int PIN_TRIG_REAR_RIGHT = 13;   
 const int PIN_ECHO_REAR_RIGHT = A0;   

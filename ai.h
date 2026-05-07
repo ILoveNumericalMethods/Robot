@@ -8,7 +8,7 @@
 
 struct RobotBrain {
 
-    float h[8];
+    float h[16];
 
     RobotBrain();
 

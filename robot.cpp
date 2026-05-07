@@ -5,7 +5,6 @@ void Robot::begin() {
     Serial.setTimeout(5);
     delay(1500);
 
-    sensors.begin();
     controller.begin();
     motors.begin();
     logger.begin();
@@ -14,12 +13,20 @@ void Robot::begin() {
 }
 
 void Robot::update() {
+    loop_start = millis();
+
     read_input();
     read_sensors();
     update_mode();
     compute_command();
     log_state();
     drive_motors();
+    
+    loop_delay = millis() - loop_start;
+    if (loop_delay > 100) {
+        Serial.print("превышено вермя цикла!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    }
+    else {delay(loop_delay);}
 }
 
 void Robot::read_input() {
@@ -43,6 +50,6 @@ void Robot::drive_motors() {
 }
 
 void Robot::log_state() {
-    //logger.log(sensors, controller);
-    logger.log_dataset(sensors, controller);
+    logger.log(sensors, controller);
+    //logger.log_dataset(sensors, controller);
 }
