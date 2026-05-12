@@ -68,7 +68,7 @@ def main():
         ser = serial.Serial(PORT, BAUD, timeout=0)
 
         # Arduino Nano обычно перезагружается при открытии Serial.
-        time.sleep(2.0)
+        time.sleep(1.0)
 
         pygame.init()
         screen = pygame.display.set_mode((500, 250))

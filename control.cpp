@@ -216,8 +216,8 @@ void Controller::compute_command(const Sensors& sensors) {
 
     if (mode == "FOLLOW") {
         previous_command = current_command;
-        //current_command = ver33.predict(sensors, previous_command);
-        current_command = MotorCommand(0,0);
+        current_command = ver33.predict(sensors, previous_command);
+        //current_command = MotorCommand(0,0);
         return;
     }
 

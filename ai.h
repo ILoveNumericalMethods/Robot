@@ -8,15 +8,12 @@
 
 struct RobotBrain {
 
-    float h[16];
+    float h[8];
 
     RobotBrain();
 
     float sigmoid(float x);
     float norm_distance(int x);
-    float norm_delta(int x);
-    float norm_angle(int x);
-    float norm_wall(float x);
     
     void begin();
 

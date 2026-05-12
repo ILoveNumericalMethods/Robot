@@ -84,8 +84,8 @@ void Logger::print_header_dataset() {
 //}
 
 
-void Logger::log_dataset(const Sensors& sensors, const Controller& controller) {
-    
+void Logger::log_dataset(const Sensors& sensors, const Controller& controller) { 
+       
     Serial.print(sensors.data.front);
     Serial.print(',');
 

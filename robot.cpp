@@ -23,7 +23,7 @@ void Robot::update() {
     drive_motors();
     
     loop_delay = millis() - loop_start;
-    if (loop_delay > 100) {
+    if (loop_delay > 120) {
         Serial.print("превышено вермя цикла!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     }
     else {delay(loop_delay);}
@@ -50,6 +50,6 @@ void Robot::drive_motors() {
 }
 
 void Robot::log_state() {
-    logger.log(sensors, controller);
-    //logger.log_dataset(sensors, controller);
+    //logger.log(sensors, controller);
+    logger.log_dataset(sensors, controller);
 }
