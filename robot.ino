@@ -1,3 +1,4 @@
+
 #include "robot.h"
 
 Robot robot;
@@ -11,6 +12,9 @@ void loop() {
 }
 
 /*
+void loop() {
+}
+
 #include <NewPing.h>
 
 // Количество датчиков

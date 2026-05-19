@@ -5,6 +5,7 @@ void Robot::begin() {
     Serial.setTimeout(5);
     delay(1500);
 
+    sensors.begin();
     controller.begin();
     motors.begin();
     logger.begin();
@@ -23,10 +24,10 @@ void Robot::update() {
     drive_motors();
     
     loop_delay = millis() - loop_start;
-    if (loop_delay > 120) {
+    if (loop_delay >= LOOP_PERIOD) {
         Serial.print("превышено вермя цикла!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     }
-    else {delay(loop_delay);}
+    else {delay(LOOP_PERIOD - loop_delay);}
 }
 
 void Robot::read_input() {

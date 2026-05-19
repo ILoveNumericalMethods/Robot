@@ -152,25 +152,25 @@ void Controller::compute_manual_command() {
 
     if (keys.w && keys.d) {
         previous_command = current_command;
-        current_command = MotorCommand(140, 60);
+        current_command = MotorCommand(140, 80);
         return;
     }
 
     if (keys.w && keys.a) {
         previous_command = current_command;
-        current_command = MotorCommand(60, 140);
+        current_command = MotorCommand(80, 140);
         return;
     }
 
     if (keys.s && keys.d) {
         previous_command = current_command;
-        current_command = MotorCommand(-140, -60);
+        current_command = MotorCommand(-140, -80);
         return;
     }
 
     if (keys.s && keys.a) {
         previous_command = current_command;
-        current_command = MotorCommand(-60, -140);
+        current_command = MotorCommand(-80, -140);
         return;
     }
 
@@ -182,7 +182,7 @@ void Controller::compute_manual_command() {
 
     if (keys.s) {
         previous_command = current_command;
-        current_command = MotorCommand(-100, -100);
+        current_command = MotorCommand(-120, -120);
         return;
     }
 
@@ -217,7 +217,7 @@ void Controller::compute_command(const Sensors& sensors) {
     if (mode == "FOLLOW") {
         previous_command = current_command;
         current_command = ver33.predict(sensors, previous_command);
-        //current_command = MotorCommand(0,0);
+        current_command = MotorCommand(0,0);
         return;
     }
 

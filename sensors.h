@@ -1,5 +1,7 @@
 #pragma once
-#include <NewPing.h>
+#include <Wire.h>
+#include <VL53L0X.h>
+#include "config.h"
 #include "pins.h"
 
 struct SensorData {
@@ -19,11 +21,12 @@ struct SensorData {
 struct Sensors {
     SensorData data;
     
-    NewPing front_sensor;
-    NewPing front_left_sensor;
-    NewPing front_right_sensor;
-    NewPing rear_right_sensor;
+    VL53L0X front_sensor;
+    VL53L0X front_left_sensor;
+    VL53L0X front_right_sensor;
+    VL53L0X rear_right_sensor;
 
-    Sensors();
+    int read_sensor_cm(VL53L0X& sensor);
+    void begin();
     void update();
 };

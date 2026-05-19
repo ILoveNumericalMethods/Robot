@@ -1,3 +1,4 @@
+#include "config.h"
 #pragma once
 
 // ===== TB6612FNG motor driver =====
@@ -16,21 +17,17 @@ const int PIN_R_PWD = 9;
 const int PIN_STBY = 12;   // Arduino D9  -> TB6612FNG STBY
 
 
-// ===== Ultrasonic sensors HY-SRF04 =====
+const int XSHUT_FRONT_LEFT = A2;
+const int FRONT_LEFT_ADRESS = 0x2A;
 
-// Front sensor
-const int PIN_TRIG_FRONT = A3;  
-const int PIN_ECHO_FRONT = A4;  
+const int XSHUT_FRONT = A1;
+const int FRONT_ADRESS = 0x2B;
 
-// Front-right sensor
-const int PIN_TRIG_FRONT_RIGHT = A1;  
-const int PIN_ECHO_FRONT_RIGHT = A2;  
+const int XSHUT_FRONT_RIGHT = A3;
+const int FRONT_RIGHT_ADRESS = 0x2C;
 
-// Front-left sensor
-const int PIN_TRIG_FRONT_LEFT = 11;  
-const int PIN_ECHO_FRONT_LEFT = 10;  
+const int XSHUT_REAR_RIGHT = A0;
+const int REAR_RIGHT_ADRESS = 0x2D;
 
-// Rear-right sensor
-const int PIN_TRIG_REAR_RIGHT = 13;   
-const int PIN_ECHO_REAR_RIGHT = A0;   
-
+const int XSHUTS[NUMBER_OF_SENSORS] = {XSHUT_FRONT_LEFT, XSHUT_FRONT, XSHUT_FRONT_RIGHT, XSHUT_REAR_RIGHT};
+const int SENSOR_ADDRESSES[NUMBER_OF_SENSORS] = {FRONT_LEFT_ADRESS, FRONT_ADRESS, FRONT_RIGHT_ADRESS, REAR_RIGHT_ADRESS};

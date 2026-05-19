@@ -9,7 +9,7 @@ PORT = "COM12"
 BAUD = 115200
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-LOG_FILE = os.path.join(SCRIPT_DIR, "log.csv")
+LOG_FILE = os.path.join(SCRIPT_DIR, "1.csv")
 
 FPS = 100
 AUTO_SEND_MANUAL_MODE = True
