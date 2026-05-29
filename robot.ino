@@ -4,11 +4,11 @@
 Robot robot;
 
 void setup() {
-    robot.begin();
+  robot.begin();
 }
 
 void loop() {
-    robot.update();
+  robot.update();
 }
 
 /*

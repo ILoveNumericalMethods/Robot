@@ -158,7 +158,7 @@ void Controller::compute_manual_command() {
 
     if (keys.w && keys.a) {
         previous_command = current_command;
-        current_command = MotorCommand(80, 140);
+        current_command = MotorCommand(73, 153);
         return;
     }
 
@@ -176,7 +176,7 @@ void Controller::compute_manual_command() {
 
     if (keys.w) {
         previous_command = current_command;
-        current_command = MotorCommand(120, 120);
+        current_command = MotorCommand(120, 129);
         return;
     }
 
@@ -217,7 +217,6 @@ void Controller::compute_command(const Sensors& sensors) {
     if (mode == "FOLLOW") {
         previous_command = current_command;
         current_command = ver33.predict(sensors, previous_command);
-        current_command = MotorCommand(0,0);
         return;
     }
 
@@ -229,7 +228,7 @@ void Controller::compute_command(const Sensors& sensors) {
 
     if (mode == "FORWARD") {
         previous_command = current_command;
-        current_command = MotorCommand(120, 120);
+        current_command = MotorCommand(120, 129);
         return;
     }
 

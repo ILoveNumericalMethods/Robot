@@ -6,7 +6,7 @@ bool Logger::is_command(const MotorCommand& command, int left, int right) {
 }
 
 void Logger::print_command(const MotorCommand& command) {
-    if (is_command(command, -70, 70) || is_command(command, 80, 140) || is_command(command, 60, 120) || is_command(command, 60, 140)) {
+    if (is_command(command, -70, 70) || is_command(command, 73, 153) || is_command(command, 60, 120) || is_command(command, 60, 140)) {
         Serial.print(1);
         Serial.print(',');
         Serial.print(0);
@@ -16,7 +16,7 @@ void Logger::print_command(const MotorCommand& command) {
     }
 
     
-    if (is_command(command, 120, 120) || is_command(command, 100, 100)) {
+    if (is_command(command, 120, 129) || is_command(command, 100, 100)) {
         Serial.print(0);
         Serial.print(',');
         Serial.print(1);
@@ -75,7 +75,7 @@ void Logger::log(const Sensors& sensors, const Controller& controller) {
 
 
 void Logger::print_header_dataset() {
-    Serial.println("front,prev_front,front_left,prev_front_left,front_right,prev_front_right,rear_right,prev_rear_right,mode1,mode2,mode3,prev_mode1,prev_mode2,prev_mode3");
+    Serial.println("front_left,prev_front_left,front,prev_front,front_right,prev_front_right,rear_right,prev_rear_right,mode1,mode2,mode3,prev_mode1,prev_mode2,prev_mode3");
 }
 
 
@@ -86,16 +86,16 @@ void Logger::print_header_dataset() {
 
 void Logger::log_dataset(const Sensors& sensors, const Controller& controller) { 
        
-    Serial.print(sensors.data.front);
-    Serial.print(',');
-
-    Serial.print(sensors.data.prev_front);
-    Serial.print(',');
-
     Serial.print(sensors.data.front_left);
     Serial.print(',');
 
     Serial.print(sensors.data.prev_front_left);
+    Serial.print(',');
+    
+    Serial.print(sensors.data.front);
+    Serial.print(',');
+
+    Serial.print(sensors.data.prev_front);
     Serial.print(',');
 
     Serial.print(sensors.data.front_right);

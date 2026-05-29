@@ -20,11 +20,11 @@ float RobotBrain::sigmoid(float x) {
 
 
 float RobotBrain::norm_distance(int x) {
-    if (x <= 60) {
-        return 0.5f * static_cast<float>(x) / 60.0f;
+    if (x <= 80) {
+        return 0.5f * static_cast<float>(x) / 80.0f;
     }
 
-    return 0.5f + 0.5f * static_cast<float>(x - 60) / 140.0f;
+    return 0.5f + 0.5f * static_cast<float>(x - 80) / 40.0f;
 }
 
 
@@ -38,18 +38,18 @@ void RobotBrain::fill_previous_command_input(const MotorCommand& previous_comman
     input[9] = 0.0f;
     input[10] = 0.0f;
 
-    if (is_command(previous_command, 60, 120) || is_command(previous_command, 60, 140)) {
+    if (is_command(previous_command, 60, 120) || is_command(previous_command, 73, 153)) {
         input[8] = 1.0f;
         return;
     }
 
-    if (is_command(previous_command, 120, 120) || is_command(previous_command, 100, 100)
+    if (is_command(previous_command, 120, 129) || is_command(previous_command, 100, 100)
     ) {
         input[9] = 1.0f;
         return;
     }
 
-    if (is_command(previous_command, 140, 60) || is_command(previous_command, 120, 60)) {
+    if (is_command(previous_command, 140, 80) || is_command(previous_command, 120, 60)) {
         input[10] = 1.0f;
         return;
     }
@@ -64,11 +64,11 @@ void RobotBrain::gru_step(
 ) {
     float input[11];
 
-    input[0] = norm_distance(sensors.data.front);
-    input[1] = norm_distance(sensors.data.prev_front);
+    input[0] = norm_distance(sensors.data.front_left);
+    input[1] = norm_distance(sensors.data.prev_front_left);
 
-    input[2] = norm_distance(sensors.data.front_left);
-    input[3] = norm_distance(sensors.data.prev_front_left);
+    input[2] = norm_distance(sensors.data.front);
+    input[3] = norm_distance(sensors.data.prev_front);
 
     input[4] = norm_distance(sensors.data.front_right);
     input[5] = norm_distance(sensors.data.prev_front_right);
@@ -175,12 +175,12 @@ MotorCommand RobotBrain::predict(
     int action = compute_action();
 
     if (action == 0) {
-        return MotorCommand(60, 140);   // wa
+        return MotorCommand(73, 153);   // wa
     }
 
     if (action == 1) {
-        return MotorCommand(120, 120);  // w
+        return MotorCommand(120, 129);  // w
     }
 
-    return MotorCommand(140, 60);       // wd
+    return MotorCommand(140, 80);       // wd
 }

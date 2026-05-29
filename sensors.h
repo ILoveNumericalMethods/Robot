@@ -29,4 +29,8 @@ struct Sensors {
     int read_sensor_cm(VL53L0X& sensor);
     void begin();
     void update();
+
+    bool i2c_alive(uint8_t address); 
+    void print_i2c_state();
+
 };
