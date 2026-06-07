@@ -110,4 +110,4 @@ The project includes an AI module for autonomous control. Of course, the control
 
 ## Limitations 
 
-The current version of the robot has several limitations. The main problems are the lack of power and messy wiring. In addition, the model was trained for a specific mechanical configuration, including the actual left and right motor rotation speeds, which were not measured separately. Therefore, if the motors or any other important part of the chassis are changed, the dataset should be collected again and the model should be retrained.
+The current version of the robot has several limitations. The main problems are unsafe starting procedure and messy wiring. In addition, the model was trained for a specific mechanical configuration, including the actual left and right motor rotation speeds, which were not measured separately. Therefore, if the motors or any other important part of the chassis are changed, the dataset should be collected again and the model should be retrained.
