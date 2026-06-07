@@ -6,17 +6,17 @@ The goal of the project is to build a mobile robot that can move along the perim
 
 ## Demonstration
 
-```markdown
+
 ![Video demonstration](docs/demo.mp4)
-```
+
 
 ### Wiring diagram
 
 The diagram below shows the principal wiring scheme:
 
-```markdown
+
 ![Wiring diagram](docs/scheme.jpg)
-```
+
 
 ## Hardware
 
