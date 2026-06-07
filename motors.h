@@ -1,5 +1,4 @@
 #pragma once
-
 #include <Arduino.h>
 
 struct MotorCommand {
@@ -10,13 +9,11 @@ struct MotorCommand {
     MotorCommand(int left_value, int right_value);
 };
 
-class Motors {
-public:
+struct Motors {
     void begin();
     void drive(const MotorCommand& command);
     void stop();
 
-private:
     void drive_left(int speed);
     void drive_right(int speed);
 };

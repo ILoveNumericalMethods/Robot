@@ -1,11 +1,12 @@
 #include "control.h"
-
 #include "ai.h"
 #include "config.h"
+
 
 ManualKeys::ManualKeys() {
     clear();
 }
+
 
 void ManualKeys::clear() {
     w = false;
@@ -14,16 +15,19 @@ void ManualKeys::clear() {
     d = false;
 }
 
+
 bool ManualKeys::empty() const {
     return !w && !a && !s && !d;
 }
 
+
 Controller::Controller() {
     mode = "WAITING";
-    warning = false;
+    warning = 0;
     previous_command = current_command;
     current_command = MotorCommand(0, 0);
 }
+
 
 void Controller::begin() {
     mode = "WAITING";
@@ -33,6 +37,7 @@ void Controller::begin() {
     keys.clear();
     ver33.begin();
 }
+
 
 void Controller::handle_serial() {
     if (!Serial.available()) {
@@ -60,6 +65,7 @@ void Controller::handle_serial() {
         handle_serial_line(last_move_line);
     }
 }
+
 
 void Controller::handle_serial_line(const String& line) {
     if (line == "m") {
@@ -92,6 +98,7 @@ void Controller::handle_serial_line(const String& line) {
     read_key_state(line);
 }
 
+
 void Controller::read_key_state(const String& line) {
     keys.clear();
 
@@ -110,19 +117,20 @@ void Controller::read_key_state(const String& line) {
     }
 }
 
+
 void Controller::update_mode(const Sensors& sensors) {
     if (mode == "MANUAL") {
         return;
     }
 
     if (danger_position(sensors)) {
-        if (warning) {
+        if (warning >= 3) {
             mode = "STOP";
             return;
         }
-        warning = true;
+        warning += 1;
     } else {
-        warning = false;
+        warning = 0;
     }
 
     if (mode == "FOLLOW") {
@@ -136,6 +144,7 @@ void Controller::update_mode(const Sensors& sensors) {
 
     mode = "FORWARD";
 }
+
 
 void Controller::compute_manual_command() {
     if (keys.empty()) {
@@ -176,7 +185,7 @@ void Controller::compute_manual_command() {
 
     if (keys.w) {
         previous_command = current_command;
-        current_command = MotorCommand(120, 129);
+        current_command = MotorCommand(120, 130);
         return;
     }
 
@@ -202,6 +211,7 @@ void Controller::compute_manual_command() {
     current_command = MotorCommand(0, 0);
 }
 
+
 void Controller::compute_command(const Sensors& sensors) {
     if (mode == "MANUAL") {
         compute_manual_command();
@@ -215,7 +225,7 @@ void Controller::compute_command(const Sensors& sensors) {
     }
 
     if (mode == "FOLLOW") {
-        previous_command = current_command;
+        previous_command = MotorCommand(120, 130);
         current_command = ver33.predict(sensors, previous_command);
         return;
     }
@@ -228,7 +238,7 @@ void Controller::compute_command(const Sensors& sensors) {
 
     if (mode == "FORWARD") {
         previous_command = current_command;
-        current_command = MotorCommand(120, 129);
+        current_command = MotorCommand(120, 130);
         return;
     }
 
@@ -236,12 +246,14 @@ void Controller::compute_command(const Sensors& sensors) {
     current_command = MotorCommand(0, 0);
 }
 
+
 bool Controller::danger_position(const Sensors& sensors) {
     return sensors.data.front <= RISE_ERROR_DISTENCE ||
            sensors.data.rear_right <= RISE_ERROR_DISTENCE ||
            sensors.data.front_right <= RISE_ERROR_DISTENCE ||
            sensors.data.front_left <= RISE_ERROR_DISTENCE;
 }
+
 
 bool Controller::wall_is_found(const Sensors& sensors) {
     return sensors.data.front < MAX_DISTANCE_TO_WALL ||

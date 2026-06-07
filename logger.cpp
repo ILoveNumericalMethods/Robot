@@ -5,6 +5,7 @@ bool Logger::is_command(const MotorCommand& command, int left, int right) {
     return command.left == left && command.right == right;
 }
 
+
 void Logger::print_command(const MotorCommand& command) {
     if (is_command(command, -70, 70) || is_command(command, 73, 153) || is_command(command, 60, 120) || is_command(command, 60, 140)) {
         Serial.print(1);
@@ -16,7 +17,7 @@ void Logger::print_command(const MotorCommand& command) {
     }
 
     
-    if (is_command(command, 120, 129) || is_command(command, 100, 100)) {
+    if (is_command(command, 120, 130) || is_command(command, 100, 100)) {
         Serial.print(0);
         Serial.print(',');
         Serial.print(1);
@@ -114,11 +115,6 @@ void Logger::log_dataset(const Sensors& sensors, const Controller& controller) {
     Serial.print(',');
 
     print_command(controller.previous_command);
-
     Serial.println();
 }
 
-
-//void Logger::log_dataset_verify(const Sensors& sensors, const Controller& controller) {
-//    log_dataset(sensors, controller);
-//}

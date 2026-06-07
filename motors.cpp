@@ -2,6 +2,7 @@
 #include "config.h"
 #include "pins.h"
 
+
 void apply_channel(int in1_pin, int in2_pin, int pwm_pin, int speed) {
     const int pwm_value = abs(speed);
 
@@ -19,7 +20,9 @@ void apply_channel(int in1_pin, int in2_pin, int pwm_pin, int speed) {
     analogWrite(pwm_pin, pwm_value);
 }
 
+
 MotorCommand::MotorCommand() : left(0), right(0) {}
+
 
 MotorCommand::MotorCommand(int left_value, int right_value)
     : left(left_value), right(right_value) {}
@@ -37,20 +40,24 @@ void Motors::begin() {
     stop();
 }
 
+
 void Motors::drive(const MotorCommand& current_command) {
     digitalWrite(PIN_STBY, HIGH);
     drive_left(current_command.left);
     drive_right(current_command.right);
 }
 
+
 void Motors::stop() {
     drive_left(0);
     drive_right(0);
 }
 
+
 void Motors::drive_left(int speed) {
     apply_channel(PIN_L_IN_1, PIN_L_IN_2, PIN_L_PWD, speed);
 }
+
 
 void Motors::drive_right(int speed) {
     apply_channel(PIN_R_IN_1, PIN_R_IN_2, PIN_R_PWD, speed);

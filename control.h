@@ -20,7 +20,7 @@ struct ManualKeys {
 struct Controller {
     String mode;
     ManualKeys keys;
-    bool warning;
+    int warning;
     MotorCommand current_command;
     MotorCommand previous_command;
     RobotBrain ver33;

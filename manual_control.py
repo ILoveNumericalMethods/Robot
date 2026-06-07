@@ -118,17 +118,14 @@ def main():
                             last_sent_command = "x"
                             print("sent: x")
 
-                # 1. Считываем текущее состояние клавиатуры.
                 keys = pygame.key.get_pressed()
                 command = build_command(keys)
-
-                # 2. Отправляем только если команда изменилась.
+     
                 if command != last_sent_command:
                     send_command(ser, command)
                     last_sent_command = command
                     print("sent:", command)
-
-                # 3. Забираем все логи из Serial, пишем в файл и печатаем в терминал.
+         
                 read_logs_to_file(ser, log_file)
 
                 screen.fill((30, 30, 30))

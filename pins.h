@@ -14,16 +14,17 @@ const int PIN_R_IN_2 = 8;
 const int PIN_R_PWD = 9;   
 
 // Driver standby pin
-const int PIN_STBY = 12;   // Arduino D9  -> TB6612FNG STBY
+const int PIN_STBY = 12;   
 
+// ===== VL53L0X TTF sensor =====
 
-const int XSHUT_FRONT_LEFT = A2;
+const int XSHUT_FRONT_LEFT = A1;
 const int FRONT_LEFT_ADRESS = 0x2A;
 
-const int XSHUT_FRONT = A1;
+const int XSHUT_FRONT = A3;
 const int FRONT_ADRESS = 0x2B;
 
-const int XSHUT_FRONT_RIGHT = A3;
+const int XSHUT_FRONT_RIGHT = A2;
 const int FRONT_RIGHT_ADRESS = 0x2C;
 
 const int XSHUT_REAR_RIGHT = A0;

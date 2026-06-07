@@ -9,17 +9,12 @@ SensorData::SensorData()
     prev_front(INVALID_DISTANCE),
     prev_front_left(INVALID_DISTANCE),
     prev_front_right(INVALID_DISTANCE),
-prev_rear_right(INVALID_DISTANCE) {}
+    prev_rear_right(INVALID_DISTANCE) {}
 
 
 void Sensors::begin() {
   Wire.begin();
   Wire.setClock(100000);
-
-  //front_left_sensor = VL53L0X();
-  //front_sensor = VL53L0X();
-  //front_right_sensor = VL53L0X();
-  //rear_right_sensor = VL53L0X();
 
   for (int i = 0; i < NUMBER_OF_SENSORS; i++) {
     pinMode(XSHUTS[i], OUTPUT);
@@ -42,7 +37,6 @@ void Sensors::begin() {
     delay(20);
  
     sensors[i]->setTimeout(MAX_TIME_ON_SENSOR);
-    //Serial.print("suc1 ");
 
     if (!sensors[i]->init()) {
       Serial.print("VL53L0X init error, sensor ");
@@ -51,10 +45,9 @@ void Sensors::begin() {
       while (true) {
       }
     }
-    //Serial.print("suc2 ");
     
     sensors[i]->setAddress(SENSOR_ADDRESSES[i]);
-    //Serial.print("suc3 ");
+  
     if (!sensors[i]->setMeasurementTimingBudget(33000)) {
       Serial.print("VL53L0X timing budget error, sensor ");
       Serial.println(i);
@@ -62,10 +55,9 @@ void Sensors::begin() {
       while (true) {
       }
     }
-    //Serial.print("suc4 ");
-
   }
 }
+
 
 int Sensors::read_sensor_cm(VL53L0X& sensor) {
   uint16_t distance_mm = sensor.readRangeSingleMillimeters();
@@ -74,7 +66,6 @@ int Sensors::read_sensor_cm(VL53L0X& sensor) {
       return INVALID_DISTANCE;
   }
 
-  // Перевод мм -> см
   int distance_cm = (distance_mm + 5) / 10;
 
   if (distance_cm > INVALID_DISTANCE) {
@@ -84,7 +75,8 @@ int Sensors::read_sensor_cm(VL53L0X& sensor) {
   return distance_cm;
 }
 
-
+//debugging
+/*
 bool Sensors::i2c_alive(uint8_t address) {
   Wire.beginTransmission(address);
   return Wire.endTransmission() == 0;
@@ -101,24 +93,9 @@ void Sensors::print_i2c_state() {
       Serial.println(i2c_alive(addr) ? "OK" : "NO");
   }
 }
-
+*/
 
 void Sensors::update() {
-  /*bool need_reinit = false;
-
-  for (int i = 0; i < NUMBER_OF_SENSORS; i++) {
-    if (!i2c_alive(SENSOR_ADDRESSES[i])) {
-      need_reinit = true;
-      break;
-    }
-  }
-
-  if (need_reinit) {
-    begin();
-  }*/ 
-
-
-  //int time = millis();
   data.prev_front = data.front;
   data.front = read_sensor_cm(front_sensor);
 
@@ -131,6 +108,7 @@ void Sensors::update() {
   data.prev_front_right = data.front_right;
   data.front_right = read_sensor_cm(front_right_sensor);
 
+  // debugging
   //print_i2c_state();
 }
 

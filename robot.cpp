@@ -1,5 +1,6 @@
 #include "robot.h"
 
+
 void Robot::begin() {
     Serial.begin(115200);
     Serial.setTimeout(5);
@@ -9,9 +10,9 @@ void Robot::begin() {
     controller.begin();
     motors.begin();
     logger.begin();
-    //logger.print_header_dataset_verify();
     logger.print_header_dataset();
 }
+
 
 void Robot::update() {
     loop_start = millis();
@@ -30,25 +31,31 @@ void Robot::update() {
     else {delay(LOOP_PERIOD - loop_delay);}
 }
 
+
 void Robot::read_input() {
     controller.handle_serial();
 }
+
 
 void Robot::read_sensors() {
     sensors.update();
 }
 
+
 void Robot::update_mode() {
     controller.update_mode(sensors);
 }
+
 
 void Robot::compute_command() {
     controller.compute_command(sensors);
 }
 
+
 void Robot::drive_motors() {
     motors.drive(controller.current_command);
 }
+
 
 void Robot::log_state() {
     //logger.log(sensors, controller);
